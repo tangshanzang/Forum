@@ -28,13 +28,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public AppUser getUserById(int id) {
-        return null;
+    public AppUser getUserByUsername(String username) {
+        return userRepo.findByUsername(username);
     }
 
     @Override
     public List<AppUser> getUsers() {
-        return null;
+        return userRepo.findAll();
     }
 
     @Override

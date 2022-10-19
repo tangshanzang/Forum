@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login/**").permitAll()
+                .antMatchers("/login/**","/api/user/**").permitAll()
                 .anyRequest().authenticated();
     }
 }

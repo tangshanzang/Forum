@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface UserService {
     AppUser createUser(AppUser user);
-    AppUser getUserById(int id);
+    AppUser getUserByUsername(String username);
     List<AppUser> getUsers();
     Role createRole(Role role);
     // DELETE this later!! admin only direct edit in DB!
