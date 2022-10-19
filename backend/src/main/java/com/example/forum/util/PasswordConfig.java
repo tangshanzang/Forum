@@ -1,13 +1,14 @@
 package com.example.forum.util;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class helper {
-
-    public PasswordEncoder passwordEncoder(){
+@Configuration
+public class PasswordConfig {
+    @Bean
+    public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
-
-
 }

@@ -20,7 +20,7 @@ public class AppUser {
 
     @Id
     @GeneratedValue(strategy = AUTO)
-    private int id;
+    private Long id;
 
     private String username;
 
