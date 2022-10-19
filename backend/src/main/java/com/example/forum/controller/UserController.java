@@ -4,10 +4,7 @@ import com.example.forum.entity.AppUser;
 import com.example.forum.service.UserServices.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,8 +15,13 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    @PostMapping("/create")
+    public ResponseEntity<?> createUser(@RequestParam String username, @RequestParam String password,
+                                        @RequestParam String name){
+        AppUser user = new AppUser(username, password, name);
+        return ResponseEntity.ok().body(userService.createUser(user));
+    }
 
-    public ResponseEntity<AppUser> createUser;
     public ResponseEntity<?> logout;
     public ResponseEntity<?> updateUser;
     public ResponseEntity<?> deleteUser;

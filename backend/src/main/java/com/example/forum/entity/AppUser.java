@@ -53,4 +53,11 @@ public class AppUser {
     private Collection<Group> groups = new ArrayList<>();
 
     private String status = "active";
+
+    public AppUser(String username, String password, String name) {
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        createdTime = LocalDateTime.now();
+    }
 }
