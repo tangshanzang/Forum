@@ -16,8 +16,8 @@ public class PostController {
     public ResponseEntity<Post> createPost;
     public ResponseEntity<?> deletePost;
     public ResponseEntity<?> updatePost;
-    public ResponseEntity<?> getPostWithThreadId;
-    public ResponseEntity<?> getPostWithPostId;
-    public ResponseEntity<?> getPostWithUserId;
+    public ResponseEntity<?> getPostWithThreadName;
+    public ResponseEntity<?> getPostWithPostName;
+    public ResponseEntity<?> getPostWithUserName;
     public ResponseEntity<?> getAllPosts;
 }

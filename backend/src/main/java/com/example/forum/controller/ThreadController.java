@@ -16,8 +16,8 @@ public class ThreadController {
     public ResponseEntity<Thread> createThread;
     public ResponseEntity<?> deleteThread;
     public ResponseEntity<?> updateThread;
-    public ResponseEntity<?> getThreadWithGroupId;
-    public ResponseEntity<?> getThreadWithThreadId;
-    public ResponseEntity<?> getThreadWithUserId;
+    public ResponseEntity<?> getThreadWithGroupName;
+    public ResponseEntity<?> getThreadWithThreadName;
+    public ResponseEntity<?> getThreadWithUserName;
     public ResponseEntity<?> getAllThreads;
 }

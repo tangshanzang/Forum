@@ -17,6 +17,6 @@ public class UserController {
     public ResponseEntity<?> logout;
     public ResponseEntity<?> updateUser;
     public ResponseEntity<?> deleteUser;
-    public ResponseEntity<?> getUserWithId;
+    public ResponseEntity<?> getUserWithUserName;
     public ResponseEntity<?> getAllUsers;
 }

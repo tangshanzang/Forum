@@ -16,7 +16,7 @@ public class GroupController {
     public ResponseEntity<Group> createGroup;
     public ResponseEntity<?> deleteGroup;
     public ResponseEntity<?> updateGroup;
-    public ResponseEntity<?> getGroupWithGroupId;
-    public ResponseEntity<?> getGroupWithUserId;
+    public ResponseEntity<?> getGroupWithGroupName;
+    public ResponseEntity<?> getGroupWithUserName;
     public ResponseEntity<?> getAllGroups;
 }
