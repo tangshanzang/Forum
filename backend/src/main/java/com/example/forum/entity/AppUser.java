@@ -54,10 +54,10 @@ public class AppUser {
 
     private String status = "active";
 
-    public AppUser(String username, String password, String name) {
-        this.username = username;
-        this.password = password;
-        this.name = name;
-        createdTime = LocalDateTime.now();
-    }
+//    public AppUser(String username, String password, String name) {
+//        this.username = username;
+//        this.password = password;
+//        this.name = name;
+//        createdTime = LocalDateTime.now();
+//    }
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -16,18 +17,25 @@ public class UserController {
 
     private final UserService userService;
     @PostMapping("/create")
-    public ResponseEntity<?> createUser(@RequestParam String username, @RequestParam String password,
-                                        @RequestParam String name){
-        AppUser user = new AppUser(username, password, name);
+    public ResponseEntity<?> createUser(@RequestBody AppUser user){
+//        AppUser user = new AppUser(username, password, name);
         return ResponseEntity.ok().body(userService.createUser(user));
     }
 
     public ResponseEntity<?> logout;
     public ResponseEntity<?> updateUser;
-    public ResponseEntity<?> deleteUser;
-    public ResponseEntity<?> getUserWithUserName;
+    @DeleteMapping("/delete")
+    public @ResponseBody ResponseEntity<?> deleteUser(Principal principal){
+        System.out.println(principal);
+        return ResponseEntity.ok().body(userService.deleteUser(principal.getName()));
+    }
+    @GetMapping("/find")
+    public ResponseEntity<?> getUserWithUserName(@RequestParam String username){
+        return ResponseEntity.ok().body(userService.getUserByUsername(username));
+    }
+
     @GetMapping("/users")
     public ResponseEntity<List<AppUser>> getAllUsers(){
         return ResponseEntity.ok().body(userService.getUsers());
-    };
+    }
 }

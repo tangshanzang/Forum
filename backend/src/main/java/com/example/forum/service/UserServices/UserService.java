@@ -12,4 +12,5 @@ public interface UserService {
     Role createRole(Role role);
     // DELETE this later!! admin only direct edit in DB!
     void addRoleToUser(String username, String roleName);
+    Boolean deleteUser(String username);
 }
