@@ -37,6 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // allow controller api calls base on role
         // proper order
         // refresh endpoint in usercontroller
+        // *** user needs to be able to reach refresh endpoint without being logged in ***
         http
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(STATELESS)
