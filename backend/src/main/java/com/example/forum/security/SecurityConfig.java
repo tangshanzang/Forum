@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -28,11 +29,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         // Authentication identifies user
         // Authorization checks if a user can/can't do certain thing
+
+        // Checktoken -> if null -> frontend send request to refresh accesstoken -> if no refresh -> login -> save refresh token in session storage
+
+        // NEED REFRESH endpoint
+        // Things to do:
+        // allow controller api calls base on role
+        // proper order
+        // refresh endpoint in usercontroller
         http
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(STATELESS)
                 .and()
                 .addFilter(new CustomAuthenticationFilter(authenticationManager()))
+                .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
 //                .antMatchers("/login/**","/api/user/**").permitAll()
                 .antMatchers("/login/**").permitAll()

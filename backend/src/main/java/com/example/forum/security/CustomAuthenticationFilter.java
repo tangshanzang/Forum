@@ -64,7 +64,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         // Return this in header or body? Doesn't seem to matter
         // Header
         //        response.setHeader("access_token", access_token);
-//        response.setHeader("refresh_token", refresh_token);
+        //        response.setHeader("refresh_token", refresh_token);
 
         // Body
         Map<String, String> tokens = new HashMap<>();
