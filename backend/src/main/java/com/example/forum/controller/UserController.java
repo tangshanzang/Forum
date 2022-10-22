@@ -3,6 +3,8 @@ package com.example.forum.controller;
 import com.example.forum.entity.AppUser;
 import com.example.forum.service.UserServices.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin
 public class UserController {
 
     private final UserService userService;
@@ -35,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<AppUser>> getAllUsers(){
-        return ResponseEntity.ok().body(userService.getUsers());
+    public ResponseEntity<Resource> getAllUsers(){
+        return new ResponseEntity(userService.getUsers(), HttpStatus.OK);
     }
 }

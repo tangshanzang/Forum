@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         Boolean isDeleted = false;
         AppUser user = userRepo.findByUsername(username);
         userRepo.delete(user);
-        return true;
+        return isDeleted;
     }
 
     @Override
