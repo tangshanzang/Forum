@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import {getData, postData} from '../../service/ApiService'
 
-function Login(){
+function Login(props){
     const [inputs, setInputs] = useState("");
 
     const handleChange = (event) => {
@@ -12,25 +12,30 @@ function Login(){
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        getUsers();
+        // getUsers();
+        postLogin();
     }
 
-    const getUsers = () =>{
-        getData("/api/user/users")
-        .then(response => {
-            return  response.json();
-        }).then(data => {
-            console.log(data);
-        })
-    }
+    // const getUsers = () =>{
+    //     getData("/api/user/users")
+    //     .then(response => {
+    //         return  response.json();
+    //     }).then(data => {
+    //         console.log(data);
+    //     })
+    // }
 
     const postLogin = () => {
-        postData("/login", inputs)
-            .then(response => {
-                return response.json();
-            }).then(data => {
-                console.log(data);
-            })
+        fetch('/api/login?username=' + inputs.username + '&password=' + inputs.password, {
+            method: 'POST',
+          }).then(response => {
+            return response.json();
+        }).then(data => {
+            // save to session storage
+            sessionStorage.setItem("access-token", data.access_token)
+            sessionStorage.setItem("refresh-token", data.refresh_token)
+            props.handleChangeProp(true);
+        })
     }
 
   return (

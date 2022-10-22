@@ -29,44 +29,46 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // Here i check if they have a token -> decode token -> tell the security who this user is and what permission they have based on their roles
-
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        // Check if there is a token starting with Bearer
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
-            try {
-                String token = authorizationHeader.substring("Bearer ".length());
-                // algorithm must match the one we used when signing this
-                Algorithm algorithm = Algorithm.HMAC256("yang's secret".getBytes());
-                JWTVerifier verifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = verifier.verify(token);
-                String username = decodedJWT.getSubject();
-                String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
-                // Because they expect a GrantedAuthority type we have to convert our roles array
-                Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                stream(roles).forEach(role -> {
-                    authorities.add(new SimpleGrantedAuthority(role));
-                });
-
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                filterChain.doFilter(request, response);
-            }
-            catch (Exception exception){
-                response.setHeader("error", exception.getMessage());
-                response.setStatus(FORBIDDEN.value());
-                // Header
-//                    response.sendError(FORBIDDEN.value());
-
-                // Body
-                Map<String, String> error = new HashMap<>();
-                error.put("error_msg", exception.getMessage());
-                response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
-            }
-        }else{
+        if(request.getServletPath().equals("/api/login")){
             filterChain.doFilter(request, response);
         }
+        else{
+            String authorizationHeader = request.getHeader(AUTHORIZATION);
+            // Check if there is a token starting with Bearer
+            if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
+                try {
+                    String token = authorizationHeader.substring("Bearer ".length());
+                    // algorithm must match the one we used when signing this
+                    Algorithm algorithm = Algorithm.HMAC256("yang's secret".getBytes());
+                    JWTVerifier verifier = JWT.require(algorithm).build();
+                    DecodedJWT decodedJWT = verifier.verify(token);
+                    String username = decodedJWT.getSubject();
+                    String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+                    // Because they expect a GrantedAuthority type we have to convert our roles array
+                    Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                    stream(roles).forEach(role -> {
+                        authorities.add(new SimpleGrantedAuthority(role));
+                    });
 
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    filterChain.doFilter(request, response);
+                }
+                catch (Exception exception){
+                    response.setHeader("error", exception.getMessage());
+                    response.setStatus(FORBIDDEN.value());
+                    // Header
+//                    response.sendError(FORBIDDEN.value());
 
+                    // Body
+                    Map<String, String> error = new HashMap<>();
+                    error.put("error_msg", exception.getMessage());
+                    response.setContentType(APPLICATION_JSON_VALUE);
+                    new ObjectMapper().writeValue(response.getOutputStream(), error);
+                }
+            }else{
+                filterChain.doFilter(request, response);
+            }
+        }
     }
 }

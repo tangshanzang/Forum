@@ -5,6 +5,8 @@ import com.example.forum.entity.Role;
 import com.example.forum.repository.RoleRepository;
 import com.example.forum.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -66,6 +70,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // get user in db, create authority for every role. userDetail in return#
 //            public User(String username, String password, Collection<? extends GrantedAuthority > authorities) {
-        return null;
+        AppUser user = userRepo.findByUsername(username);
+        if(user == null){
+            throw new UsernameNotFoundException("User not found");
+        }
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        user.getRoles().forEach(role -> {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        });
+        return new User(user.getUsername(), user.getPassword(), authorities);
     }
 }
