@@ -48,8 +48,14 @@ public class UserController {
     public ResponseEntity<?> logout;
     public ResponseEntity<?> updateUser;
     @DeleteMapping("/delete")
-    public @ResponseBody ResponseEntity<?> deleteUser(Principal principal){
-        return ResponseEntity.ok().body(userService.deleteUser(principal.getName()));
+    public @ResponseBody ResponseEntity<?> deleteUser(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            return ResponseEntity.badRequest().body("");
+        } else {
+            userService.deleteUser(auth.getName());
+            return ResponseEntity.ok().body("deleted");
+        }
     }
     @GetMapping("/find")
     public ResponseEntity<?> getUserWithUserName(@RequestParam String username){

@@ -9,6 +9,17 @@ export async function getData(url = '', token = '') {
     return response;
 }
 
+export async function deleteData(url = '', token = '') {
+    const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+    });
+    return response;
+}
+
 export async function postData(url = '', data = {}) {
     const response = await fetch(url, {
         method: 'POST',

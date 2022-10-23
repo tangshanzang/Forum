@@ -14,8 +14,10 @@ const App = () => {
       };
 
       useEffect(() => {
-        console.log('isLoggedIn', isLoggedIn);
-      }, [isLoggedIn])
+        if(sessionStorage.getItem("access-token")){
+            setIsLoggedIn(true);
+        }
+      }, [])
 
   return (
     <div>

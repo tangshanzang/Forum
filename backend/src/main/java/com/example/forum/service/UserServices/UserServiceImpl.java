@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public AppUser createUser(AppUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+//        Role role = roleRepo.findByName("ROLE_SUPERADMIN");
         Role role = roleRepo.findByName("ROLE_USER");
         user.getRoles().add(role);
         user.setCreatedTime(LocalDateTime.now());
@@ -61,10 +62,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Boolean deleteUser(String username) {
-        Boolean isDeleted = false;
         AppUser user = userRepo.findByUsername(username);
-        userRepo.delete(user);
-        return isDeleted;
+        user.setUsername("[Deleted]");
+        return true;
     }
 
     @Override

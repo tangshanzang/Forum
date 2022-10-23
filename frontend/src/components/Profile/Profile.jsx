@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {getData, postData} from '../../service/ApiService'
+import {getData, deleteData} from '../../service/ApiService'
 import ProfileElement from './ProfileElement/ProfileElement'
 import './Profile.css';
 
@@ -24,10 +24,13 @@ const Profile = () => {
 
             return response.json();
         }).then(data => {
-            console.log(data)
             setUser(data);
         }).catch(() => {
             getAccessToken();
+            if(sessionStorage.getItem("access-token") !== null || sessionStorage.getItem("access-token") !== ""
+            || sessionStorage.getItem("access-token") !== undefined){
+                getUser();
+            }
         });
     }
 
@@ -39,10 +42,38 @@ const Profile = () => {
             // Save tokens
             sessionStorage.setItem("access-token", data.access_token);
             sessionStorage.setItem("refresh-token", data.refresh_token);
-            // Retry
-            getUser();
         })
     }
+
+    const handleDelete = () =>{
+        // console.log("clicked")
+        deleteUser();
+    }
+
+    const deleteUser = () =>{
+        deleteData("/api/user/delete", sessionStorage.getItem("access-token"))
+        .then(response => {
+            // If no access token, send refresh
+            if(!response.ok) 
+            throw new Error(response.status)
+
+            return response.json();
+        }).then(data => {
+            setUser({
+                groups: [],
+                threads: [],
+                posts: []
+            });
+            sessionStorage.clear();
+        }).catch(() => {
+            getAccessToken();
+            if(sessionStorage.getItem("access-token") !== null || sessionStorage.getItem("access-token") !== ""
+            || sessionStorage.getItem("access-token") !== undefined){
+                deleteUser();
+            }
+        });
+    }
+    
     
 
   return (
@@ -111,6 +142,8 @@ const Profile = () => {
             {user.posts.length}
             </p>
         </div>
+
+        <button onClick={() => handleDelete()}>Delete</button>
     </div>
   )
 }
