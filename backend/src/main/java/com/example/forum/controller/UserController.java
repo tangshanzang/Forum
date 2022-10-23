@@ -42,22 +42,24 @@ public class UserController {
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@RequestBody AppUser user){
 //        AppUser user = new AppUser(username, password, name);
-        System.out.println("called");
         return ResponseEntity.ok().body(userService.createUser(user));
     }
 
-    public ResponseEntity<?> logout;
-    public ResponseEntity<?> updateUser;
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@RequestParam String name, @RequestParam String password){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(auth.getName());
+        String msg = userService.updateUser(auth.getName(), name, password);
+        return ResponseEntity.ok().body(msg);
+    }
+
     @DeleteMapping("/delete")
     public @ResponseBody ResponseEntity<?> deleteUser(){
-        System.out.println("trying to delete");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
-            System.out.println("trying to delete - failed");
             return ResponseEntity.badRequest().body("");
         } else {
             userService.deleteUser(auth.getName());
-            System.out.println("trying to delete - made it");
             return ResponseEntity.noContent().build();
         }
     }

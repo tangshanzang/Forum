@@ -1,8 +1,15 @@
 <script setup>
+import NavBar from '../components/NavBar.vue'
 </script>
 
 <template>
-  <main>
-    <h1>HAHA</h1>
-  </main>
+  <NavBar />
 </template>
+
+<script>
+export default {
+  components: {
+    NavBar
+  }
+};
+</script>

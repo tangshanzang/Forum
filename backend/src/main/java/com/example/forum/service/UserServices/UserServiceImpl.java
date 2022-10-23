@@ -75,6 +75,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public String updateUser(String username, String name, String password) {
+        AppUser user = userRepo.findByUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setName(name);
+        userRepo.save(user);
+        return "Updated";
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // get user in db, create authority for every role. userDetail in return#
 //            public User(String username, String password, Collection<? extends GrantedAuthority > authorities) {

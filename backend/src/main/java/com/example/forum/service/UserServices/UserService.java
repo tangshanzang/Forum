@@ -16,4 +16,6 @@ public interface UserService {
     Boolean deleteUser(String username);
 
     AppUserDTO currentUserDTO(String username);
+
+    String updateUser(String username, String name, String password);
 }
