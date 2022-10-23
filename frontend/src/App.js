@@ -24,7 +24,7 @@ const App = () => {
         <Navbar isLoggedIn={isLoggedIn} handleChangeProp={parentHandleChange}/>
         {
             isLoggedIn === true &&
-            <Profile/>
+            <Profile handleChangeProp={parentHandleChange}/>
         }
         <Routes>
             <Route path="/" element={<Forum />}/>

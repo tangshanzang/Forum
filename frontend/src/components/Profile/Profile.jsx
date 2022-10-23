@@ -1,18 +1,23 @@
 import React, {useState, useEffect} from 'react'
 import {getData, deleteData} from '../../service/ApiService'
-import ProfileElement from './ProfileElement/ProfileElement'
+import { useNavigate } from 'react-router-dom';
 import './Profile.css';
 
-const Profile = () => {
+const Profile = (props) => {
     const [user, setUser] = useState({
         groups: [],
         threads: [],
         posts: []
     });
+    const [tokens, setTokens] = useState({
+    });
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         getUser();
-    }, [])
+        
+    }, [])// eslint-disable-line react-hooks/exhaustive-deps
 
     // Send access token from sessionStorage
     const getUser = () =>{
@@ -29,7 +34,18 @@ const Profile = () => {
             getAccessToken();
             if(sessionStorage.getItem("access-token") !== null || sessionStorage.getItem("access-token") !== ""
             || sessionStorage.getItem("access-token") !== undefined){
-                getUser();
+                getData("/api/user/current", sessionStorage.getItem("access-token"))
+                .then(response => {
+                    // If no access token, send refresh
+                    if(!response.ok) 
+                    throw new Error(response.status)
+        
+                    return response.json();
+                }).then(data => {
+                    setUser(data);
+                }).catch(() => {
+                    console.log("Please relog")
+                });
             }
         });
     }
@@ -42,6 +58,8 @@ const Profile = () => {
             // Save tokens
             sessionStorage.setItem("access-token", data.access_token);
             sessionStorage.setItem("refresh-token", data.refresh_token);
+            console.log(data.access_token)
+            console.log(sessionStorage.getItem("access-token"))
         })
     }
 
@@ -51,27 +69,19 @@ const Profile = () => {
     }
 
     const deleteUser = () =>{
+        console.log("called delete User")
         deleteData("/api/user/delete", sessionStorage.getItem("access-token"))
         .then(response => {
-            // If no access token, send refresh
-            if(!response.ok) 
-            throw new Error(response.status)
-
-            return response.json();
+            console.log(response.status);
+            if(response.status!==204) throw new Error(response.status);
+            else return response;
         }).then(data => {
-            setUser({
-                groups: [],
-                threads: [],
-                posts: []
-            });
-            sessionStorage.clear();
+            console.log("called delete User - win")
+            console.log(data)
         }).catch(() => {
             getAccessToken();
-            if(sessionStorage.getItem("access-token") !== null || sessionStorage.getItem("access-token") !== ""
-            || sessionStorage.getItem("access-token") !== undefined){
-                deleteUser();
-            }
-        });
+            console.log(sessionStorage.getItem("access-token"))
+        })
     }
     
     

@@ -42,6 +42,7 @@ public class UserController {
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@RequestBody AppUser user){
 //        AppUser user = new AppUser(username, password, name);
+        System.out.println("called");
         return ResponseEntity.ok().body(userService.createUser(user));
     }
 
@@ -49,12 +50,15 @@ public class UserController {
     public ResponseEntity<?> updateUser;
     @DeleteMapping("/delete")
     public @ResponseBody ResponseEntity<?> deleteUser(){
+        System.out.println("trying to delete");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
+            System.out.println("trying to delete - failed");
             return ResponseEntity.badRequest().body("");
         } else {
             userService.deleteUser(auth.getName());
-            return ResponseEntity.ok().body("deleted");
+            System.out.println("trying to delete - made it");
+            return ResponseEntity.noContent().build();
         }
     }
     @GetMapping("/find")
