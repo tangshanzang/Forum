@@ -18,7 +18,7 @@ const App = () => {
 
   return (
     <div>
-        <Navbar isLoggedIn={isLoggedIn}/>
+        <Navbar isLoggedIn={isLoggedIn} handleChangeProp={parentHandleChange}/>
         <Routes>
             <Route path="/" element={<Forum />}/>
             <Route path="/login" element={<Login handleChangeProp={parentHandleChange}/>}/>
