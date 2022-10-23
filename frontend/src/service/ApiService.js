@@ -1,8 +1,9 @@
-export async function getData(url = '') {
+export async function getData(url = '', token = '') {
     const response = await fetch(url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
         },
     });
     return response;

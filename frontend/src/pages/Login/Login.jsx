@@ -45,7 +45,7 @@ function Login(props){
     }
 
   return (
-    <div className="app__login__Container">
+    <div className="app__login__container">
         {
             inputs.showError === true &&
             <p className="app_login_error-message">User not found, please check your username and password</p>

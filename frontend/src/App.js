@@ -26,7 +26,11 @@ const App = () => {
         }
         <Routes>
             <Route path="/" element={<Forum />}/>
-            <Route path="/login" element={<Login handleChangeProp={parentHandleChange}/>}/>
+            <Route path="/login" element=
+            {
+                isLoggedIn === false &&
+                <Login handleChangeProp={parentHandleChange}/>
+            }/>
         </Routes>
 
     </div>

@@ -1,5 +1,6 @@
 package com.example.forum.service.UserServices;
 
+import com.example.forum.dto.AppUserDTO;
 import com.example.forum.entity.AppUser;
 import com.example.forum.entity.Role;
 import com.example.forum.repository.RoleRepository;
@@ -64,6 +65,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         AppUser user = userRepo.findByUsername(username);
         userRepo.delete(user);
         return isDeleted;
+    }
+
+    @Override
+    public AppUserDTO currentUserDTO(String username) {
+        AppUser user = userRepo.findByUsername(username);
+        AppUserDTO appUserDTO = new AppUserDTO(user);
+        return appUserDTO;
     }
 
     @Override
