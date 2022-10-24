@@ -34,8 +34,13 @@ public class GroupController {
         return ResponseEntity.ok().body(msg);
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteGroup(@RequestParam String name){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String msg = groupService.deleteGroup(name, auth.getName());
+        return ResponseEntity.ok().body(msg);
+    }
 
-    public ResponseEntity<?> deleteGroup;
     public ResponseEntity<?> getGroupWithGroupName;
     public ResponseEntity<?> getGroupWithUserName;
 

@@ -104,17 +104,36 @@ export default {
                     headers: {
                         "Authorization": "Bearer " + sessionStorage.getItem("access_token")
                         }
-                        }
+                    }
                 )
                 if(res.status === 200){
                     var user = await res.json();
                     this.name = user.name;
                     }
                 else{
-                    this.getAccessTokenWithRefresh();
                     if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){  
-                        this.getCurrent();
+                        this.getAccessTokenWithRefresh();
+                        if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){  
+                            let res = await fetch('/api/user/current',{
+                                method: 'GET',
+                                headers: {
+                                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+                                    }
+                                }
+                            )
+                            if(res.status === 200){
+                                var user = await res.json();
+                                this.name = user.name;
+                                }
+                            // else{
+                            //     this.message = "Please login again, token has expired"
+                            //     this.logoutUser();
+                            //     sessionStorage.clear();
+                            // }
+
                     }
+                    }
+                    
                 }
         },
 
@@ -197,7 +216,7 @@ export default {
                 sessionStorage.setItem("access_token", token["access_token"])
                 sessionStorage.setItem("refresh_token", token["refresh_token"])
             }else{
-                this.message = "Please try to logout and re login!";
+                this.message = "Please try to login!";
             }
         },
 

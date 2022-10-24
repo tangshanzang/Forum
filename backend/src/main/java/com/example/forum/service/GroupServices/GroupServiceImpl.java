@@ -56,16 +56,29 @@ public class GroupServiceImpl implements GroupService{
             return "User Is Blocked";
         }else if (Objects.equals(group.getStatus(), "blocked")) {
             return "Group Is Blocked";
-        }else if (group == null) {
-            return "Group Does Not Exist";
-        }else if (groupRepo.findByName(name) != null) {
-            return "Group Name Is Taken";
         }else if (!Objects.equals(group.getOwner().getId(), user.getId())) {
             return "You Can't Update Other's Groups";
         }else{
-            group.setName(name);
             group.setDescription(description);
             return "Group Has Been Updated";
+        }
+    }
+
+    @Override
+    public String deleteGroup(String name, String username) {
+        AppUser user = userRepo.findByUsername(username);
+        Group group = groupRepo.findByName(name);
+
+        if(Objects.equals(user.getStatus(), "blocked")) {
+            return "User Is Blocked";
+        }else if (Objects.equals(group.getStatus(), "blocked")) {
+            return "Group Is Blocked";
+        }else if (!Objects.equals(group.getOwner().getId(), user.getId())) {
+            return "You Can't Delete Other's Groups";
+        }else{
+            group.setName("[Deleted Group]");
+            group.setStatus("deleted");
+            return "Group Has Been Deleted";
         }
     }
 }
