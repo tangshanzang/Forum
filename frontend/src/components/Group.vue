@@ -25,6 +25,15 @@
             {{isTryingToUpdate ? "Update" : "Create"}}
         </button>
     </div>
+    <div class="app__group__container__content">
+        <div v-for="group in groups" :key="group.id" class="app__group__container__content__groupContainer">
+            <div @click="navigate(group.id)" class="app__group__container__content__groupContainer__group">
+                <p class="">{{ group.name }}</p>
+                <p class="">{{ group.description }}</p>
+            </div>
+
+        </div>
+    </div>
   </div>
 </template>
 
@@ -53,6 +62,10 @@ export default {
         }
     },
     methods:{
+        navigate(id) {
+            this.$router.push('/group/' + id)
+        },
+         
         handleClick(e){
             if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                 if(e === "update"){
@@ -75,52 +88,63 @@ export default {
         },
 
         async createGroup() {
-            let res = await fetch('/api/group/create', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
-                },
-                body: JSON.stringify(this.newGroup)
-            })
-            var msg = await res.text();
+            if(!this.newGroup.name || !this.newGroup.description){
+                this.message = "Please fill all group info"
+            }
+            else{
 
-            if(msg == "Group Has Been Created"){
-                this.message = msg;
-                this.groups = await this.fetchGroups();
-            }else if(msg == "Group Name Is Taken" || msg == "User Is Blocked"){
-                this.message = msg;
-            }else if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
-                this.getAccessTokenWithRefresh();
-                // double if cause the above method might force logout
-                if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
-                    this.createGroup();
+                let res = await fetch('/api/group/create', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+                    },
+                    body: JSON.stringify(this.newGroup)
+                })
+                var msg = await res.text();
+    
+                if(msg == "Group Has Been Created"){
+                    this.message = msg;
+                    this.groups = await this.fetchGroups();
+                }else if(msg == "Group Name Is Taken" || msg == "User Is Blocked"){
+                    this.message = msg;
+                }else if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
+                    this.getAccessTokenWithRefresh();
+                    // double if cause the above method might force logout
+                    if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
+                        this.createGroup();
+                    }
                 }
             }
         },
 
         async updateGroup() {
-            let res = await fetch('/api/group/update?name=' + this.newGroup.name + '&description=' + this.description, {
-                method: 'POST',
-                headers: {
-                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
-                },
-                body: JSON.stringify(this.newGroup)
-            })
+            if(!this.newGroup.name || !this.newGroup.description){
+                this.message = "Please fill all group info"
+            }else{
 
-            var msg = await res.text();
-            console.log(msg);
-
-            // if(msg){
-            //     this.message = await res.text()
-            //     this.groups = await this.fetchGroups()
-            // }else if(res.status === 403 && (sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token"))){
-            //     this.getAccessTokenWithRefresh();
-            //     // double if cause the above method might force logout
-            //     if(res.status === 403 && (sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token"))){
-            //         this.createGroup();
-            //     }
-            // }
+                let res = await fetch('/api/group/update?name=' + this.newGroup.name + '&description=' + this.description, {
+                    method: 'POST',
+                    headers: {
+                        "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+                    },
+                    body: JSON.stringify(this.newGroup)
+                })
+    
+                var msg = await res.text();
+                console.log(msg);
+    
+                // if(msg){
+                //     this.message = await res.text()
+                //     this.groups = await this.fetchGroups()
+                // }else if(res.status === 403 && (sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token"))){
+                //     this.getAccessTokenWithRefresh();
+                //     // double if cause the above method might force logout
+                //     if(res.status === 403 && (sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token"))){
+                //         this.createGroup();
+                //     }
+                // }
+            }
         },
 
         async getAccessTokenWithRefresh(){
