@@ -1,6 +1,10 @@
 <template>
   <header>
       <div class="app__header__container">
+            <div class="app__nav__container">
+                <a @click="navigate('/')">Home</a>
+                <a v-if="isAdmin" @click="navigate('/admin')">Admin</a>
+            </div>
           <p class="app__header__container__message" v-if="message">{{ message }}</p>
             <div v-if="!loggedIn" class="app__header__container__notLoggedIn">
                 <h2>Welcome, Visitor</h2>
@@ -87,7 +91,8 @@ export default {
             username: '',
             password: '',
             name: '',
-            loggedIn: false
+            loggedIn: false,
+            isAdmin: false
         }
     },
     methods:{
@@ -109,6 +114,9 @@ export default {
                 if(res.status === 200){
                     var user = await res.json();
                     this.name = user.name;
+                    if(user.role == "ROLE_ADMIN"){
+                        this.isAdmin = true;
+                    }
                     }
                 else{
                     if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){  
@@ -155,6 +163,10 @@ export default {
                     this.message = "Wrong username/password!";
                 }
             }
+        },
+
+        navigate(e) {
+            this.$router.push(e);
         },
 
         async registerUser(){
@@ -226,6 +238,7 @@ export default {
             this.username = "";
             this.password = "";
             this.name = "";
+            this.isAdmin = false;
         },
 
         async deleteUser(){

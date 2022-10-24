@@ -2,32 +2,24 @@
   <div class="app__group__container">
     <div class="app__group__container__header">
         <p v-if="message">{{message}}</p>
-        <h1 class="">Group</h1>
-        <button @click="handleClick('create', '')">Create Group</button>
+        <h1 class="">Post</h1>
+        <button @click="handleClick('create', '')">Create Post</button>
     </div>
     <div v-if="isTryingToUpdate||isTryingToCreate" class="app__group__container__content">
-        <div v-if="isTryingToCreate" class="app__group__container__content__elementContainer">
-            <label for="name" class="app__group__container__content__elementContainer__elementTitle">
-                Group name
-            </label>
-            <input class="app__group__container__content__elementContainer__elementValue" id="name" name="name" v-model="newGroup.name"
-            @keydown="checkKeyDownAlphaNumeric($event)"/>
-        </div>
-
         <div v-if="!isTryingToCreate" class="app__group__container__content__elementContainer">
             <label for="name" class="app__group__container__content__elementContainer__elementTitle">
-                Group name
+                Post ID
             </label>
             <p class="app__group__container__content__elementContainer__elementValue" id="name" name="name">
-                {{newGroup.name}}
+                {{newPost.id}}
             </p>
         </div>
 
         <div class="app__group__container__content__elementContainer">
             <label for="description" class="app__group__container__content__elementContainer__elementTitle">
-                Group description
+                Post content
             </label>
-            <input class="app__group__container__content__elementContainer__elementValue" id="description" name="description" v-model="newGroup.description"
+            <input class="app__group__container__content__elementContainer__elementValue" id="description" name="description" v-model="newPost.content"
             @keydown="checkKeyDownAlphaNumeric($event)"/>
         </div>
 
@@ -36,13 +28,12 @@
         </button>
     </div>
     <div class="app__group__container__content2">
-        <div v-for="group in groups" :key="group.id" class="app__group__container__content2__groupContainer">
+        <div v-for="post in posts" :key="post.id" class="app__group__container__content2__groupContainer">
             <div class="app__group__container__content2__groupContainer__group">
-                <p class="">{{ group.name }}</p>
-                <p class="">{{ group.description }}</p>
-                <button @click="handleClick('update', group.name)">Update Group</button>
-                <button @click="deleteGroup(group.name)">Delete Group</button>
-                <button @click="navigate(group.id)">Group's Threads</button>
+                <p class="">{{ post.id }}</p>
+                <p class="">{{ post.content }}</p>
+                <button @click="handleClick('update', post)">Update Post</button>
+                <button @click="deletePost(post)">Delete Post</button>
             </div>
         </div>
     </div>
@@ -53,10 +44,10 @@
 export default {
     async beforeCreate() {
 
-        let res = await fetch('/api/group/groups',{
+        let res = await fetch('/api/post/postsOfThread?threadId=' + this.$route.params.id,{
                 method: 'GET'
             })
-        this.groups = await res.json();
+        this.posts = await res.json();
     },
     data() {
         return {
@@ -65,10 +56,10 @@ export default {
             isTryingToUpdate: false,
             isTryingToCreate: false,
             name: '',
-            groups: [],
-            newGroup: {
-                name: "",
-                description: ""
+            posts: [],
+            newPost: {
+                id: "",
+                content: ""
             },
         }
     },
@@ -80,29 +71,27 @@ export default {
             }
         },
 
-        navigate(id) {
-            this.$router.push('/group/' + id)
-        },
-         
-        handleClick(e, name){
+        handleClick(e, post){
             if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                 if(e === "update"){
-                    if(name == "[Deleted Group]"){
-                        this.message = "This group was already deleted in DB, can not be updated"
+                    if(post.content == "[Deleted Post]"){
+                        this.message = "This post was already deleted in DB, can not be updated"
                         this.isTryingToUpdate = false;
                         this.isTryingToCreate = false;
                     }
                     else{
                         this.isTryingToUpdate = true;
                         this.isTryingToCreate = false;
-                        this.newGroup.name = name;
+                        this.newPost.content = post.content;
+                        this.newPost.id = post.id;
                         this.message = "";
                     }
             
                 }else{
                     this.isTryingToUpdate = false;
                     this.isTryingToCreate = true;
-                    this.newGroup.name = name;
+                    this.newPost.content = post.content;
+                    this.newPost.id = post.id;
             }}else{
                 this.message = "You need to log in first"
             }
@@ -110,86 +99,96 @@ export default {
 
         handleSave(){
             if(this.isTryingToCreate){
-                this.createGroup();
+                this.createPost();
             }else{
-                this.updateGroup();
+                this.updatePost();
             }
         },
 
-        async createGroup() {
-            if(!this.newGroup.name || !this.newGroup.description){
-                this.message = "Please fill all group info"
-            }else if(this.newGroup.name == "[Deleted Group]"){
-                this.message = "Invalid Group Name"
+        async createPost() {
+            if(!this.newPost.content){
+                this.message = "Please fill post content"
+            }else if(this.newPost.content == "[Deleted Post]"){
+                this.message = "Invalid post content"
             }
             else{
 
-                let res = await fetch('/api/group/create', {
+                let res = await fetch('/api/post/create?threadId=' + this.$route.params.id + '&content=' + this.newPost.content, {
                     method: 'POST',
                     headers: {
-                        "Content-Type": "application/json",
                         "Authorization": "Bearer " + sessionStorage.getItem("access_token")
                     },
-                    body: JSON.stringify(this.newGroup)
                 })
                 var msg = await res.text();
     
-                if(msg == "Group Has Been Created"){
+                // if(msg == "Post Has Been Created"){
+                //     this.message = msg;
+                //     this.isTryingToUpdate = false;
+                //     this.isTryingToCreate = false;
+                //     this.posts = await this.fetchPosts();
+                // }else if(msg == "Post Title Is Taken" || msg == "User Is Blocked" || msg == "Thread Is Blocked"){
+                //     this.message = msg;
+                // }
+                if(res.status == 200){
                     this.message = msg;
-                    this.groups = await this.fetchGroups();
-                }else if(msg == "Group Name Is Taken" || msg == "User Is Blocked"){
-                    this.message = msg;
-                }else if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
+                    this.isTryingToUpdate = false;
+                    this.isTryingToCreate = false;
+                    this.posts = await this.fetchPosts();
+                }
+                else if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                     this.getAccessTokenWithRefresh();
                     // double if cause the above method might force logout
                     if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
-                        this.createGroup();
+                        this.createPost();
                     }
                 }
             }
         },
 
-        async updateGroup() {
-            if(!this.newGroup.name || !this.newGroup.description){
-                this.message = "Please fill all group info"
-            }else if(this.newGroup.name == "[Deleted Group]"){
-                this.message = "This group was already deleted in DB, can not be updated"
+        async updatePost() {
+            if(!this.newPost.content){
+                this.message = "Please fill all post info"
+            }else if(this.newPost.content == "[Deleted Post]"){
+                this.message = "Invalid post content"
             }else{
-
-                let res = await fetch('/api/group/update?name=' + this.newGroup.name + '&description=' + this.description, {
+                var postDTO = {
+                    "id": this.newPost.id,
+                    "content": this.newPost.content
+                }
+                let res = await fetch('/api/post/update', {
                     method: 'PUT',
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + sessionStorage.getItem("access_token")
                     },
-                    body: JSON.stringify(this.newGroup)
+                    body: JSON.stringify(postDTO)
                 })
     
                 var msg = await res.text();
-                if(msg == "Group Has Been Updated"){
+                if(msg == "Post Has Been Updated"){
                     this.message = msg;
-                    this.groups = await this.fetchGroups();
-                }else if(msg == "Group Name Is Taken" || msg == "User Is Blocked"
-                 || msg == "Group Is Blocked" || msg == "Group Does Not Exist"
-                 || msg == "You Can't Update Other's Groups"){
+                    this.posts = await this.fetchPosts();
+                }else if(msg == "Post Title Is Taken" || msg == "User Is Blocked"
+                 || msg == "Post Is Blocked" || msg == "Post Does Not Exist"
+                 || msg == "You Can't Update Other's Post"){
                     this.message = msg;
                 }else if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                     this.getAccessTokenWithRefresh();
                     // double if cause the above method might force logout
                     if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
-                        let res = await fetch('/api/group/update?name=' + this.newGroup.name + '&description=' + this.description, {
+                        let res = await fetch('/api/post/update', {
                             method: 'PUT',
                             headers: {
                                 "Content-Type": "application/json",
                                 "Authorization": "Bearer " + sessionStorage.getItem("access_token")
                             },
-                            body: JSON.stringify(this.newGroup)
+                            body: JSON.stringify(postDTO)
                         })
             
                         var msg = await res.text();
-                        if(msg == "Group Has Been Updated"){
+                        if(msg == "Post Has Been Updated"){
                             this.message = msg;
-                            this.groups = await this.fetchGroups();
+                            this.posts = await this.fetchPosts();
                         }else{
                             this.message = msg;
                         }
@@ -199,47 +198,63 @@ export default {
             }
         },
 
-        async deleteGroup(groupName){
-            if(groupName == "[Deleted Group]"){
-                this.message = "This group was already deleted in DB, can not be deleted again"
+        async deletePost(post){
+                                    this.isTryingToUpdate = false;
+                        this.isTryingToCreate = false;
+            if(post.content == "[Deleted Post]"){
+                this.message = "This post was already deleted in DB, can not be deleted again"
             }
             else{
+                var postDTO = {
+                    "id": post.id,
+                    "content": post.content
+                }
 
-                let res = await fetch('/api/group/delete?name=' + groupName, {
+                let res = await fetch('/api/post/delete', {
                         method: 'DELETE',
                         headers: {
+                            "Content-Type": "application/json",
                             "Authorization": "Bearer " + sessionStorage.getItem("access_token")
                         },
+                        body: JSON.stringify(postDTO),
                     })
         
                     var msg = await res.text();
-                    if(msg == "Group Has Been Deleted"){
+                    // if(msg == "Post Has Been Deleted"){
+                    //     this.message = msg;
+                    //     this.posts = await this.fetchPosts();
+                    // }else if(msg == "User Is Blocked"
+                    //  || msg == "Thread Is Blocked" || msg == "Post Does Not Exist"
+                    //  || msg == "You Can't Delete Other's Posts"){
+                    //     this.message = msg;
+                    // }
+                    if(res.status == 200){
                         this.message = msg;
-                        this.groups = await this.fetchGroups();
-                    }else if(msg == "User Is Blocked"
-                     || msg == "Group Is Blocked" || msg == "Group Does Not Exist"
-                     || msg == "You Can't Delete Other's Groups"){
-                        this.message = msg;
-                    }else if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
+                        this.posts = await this.fetchPosts();
+                    }
+                    else if(sessionStorage.getItem("refresh_token")){
                         this.getAccessTokenWithRefresh();
                         // double if cause the above method might force logout
-                        if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
-                            let res = await fetch('/api/group/delete?name=' + groupName, {
+                        if(sessionStorage.getItem("access_token")){
+                            let res = await fetch('/api/post/delete', {
                                 method: 'DELETE',
                                 headers: {
+                                    "Content-Type": "application/json",
                                     "Authorization": "Bearer " + sessionStorage.getItem("access_token")
                                 },
+                                body: JSON.stringify(postDTO),
                             })
                 
                             var msg = await res.text();
-                            if(msg == "Group Has Been Deleted"){
+                            if(res.status == 200){
                                 this.message = msg;
-                                this.groups = await this.fetchGroups();
-                            }else{
-                                this.message = msg;
+                                this.posts = await this.fetchPosts();
                             }
-                        }
+                        }else{
+                        this.message = "You must log in first"}
     
+                    }else{
+                        this.message = "You must log in first"
                     }
             }
         },
@@ -261,8 +276,8 @@ export default {
             }
         },
 
-        async fetchGroups() {
-            let res = await fetch('/api/group/groups',{
+        async fetchPosts() {
+            let res = await fetch('/api/post/postsOfThread?threadId=' + this.$route.params.id,{
                 method: 'GET'
             })
             return await res.json()

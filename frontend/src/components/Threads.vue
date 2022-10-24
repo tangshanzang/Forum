@@ -10,7 +10,8 @@
             <label for="name" class="app__group__container__content__elementContainer__elementTitle">
                 Thread title
             </label>
-            <input class="app__group__container__content__elementContainer__elementValue" id="name" name="name" v-model="newThread.title"/>
+            <input class="app__group__container__content__elementContainer__elementValue" id="name" name="name" v-model="newThread.title"
+            @keydown="checkKeyDownAlphaNumeric($event)"/>
         </div>
 
         <div v-if="!isTryingToCreate" class="app__group__container__content__elementContainer">
@@ -26,16 +27,17 @@
             <label for="description" class="app__group__container__content__elementContainer__elementTitle">
                 Thread content
             </label>
-            <input class="app__group__container__content__elementContainer__elementValue" id="description" name="description" v-model="newThread.content"/>
+            <input class="app__group__container__content__elementContainer__elementValue" id="description" name="description" v-model="newThread.content"
+            @keydown="checkKeyDownAlphaNumeric($event)"/>
         </div>
 
         <button @click="handleSave()" class="app__group__container__content__button">
             {{isTryingToUpdate ? "Update" : "Create"}}
         </button>
     </div>
-    <div class="app__group__container__content">
-        <div v-for="thread in threads" :key="thread.id" class="app__group__container__content__groupContainer">
-            <div class="app__group__container__content__groupContainer__group">
+    <div class="app__group__container__content2">
+        <div v-for="thread in threads" :key="thread.id" class="app__group__container__content2__groupContainer">
+            <div class="app__group__container__content2__groupContainer__group">
                 <p class="">{{ thread.title }}</p>
                 <p class="">{{ thread.content }}</p>
                 <button @click="handleClick('update', thread.title)">Update Thread</button>
@@ -71,6 +73,13 @@ export default {
         }
     },
     methods:{
+        checkKeyDownAlphaNumeric(event) {
+            if (!/[a-zA-Z0-9\s]/.test(event.key)) {
+                this.ignoredValue = event.key ? event.key : "";
+                event.preventDefault();
+            }
+        },
+        
         navigate(id) {
             this.$router.push('/thread/' + id)
         },

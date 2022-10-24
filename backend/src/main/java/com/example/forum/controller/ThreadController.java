@@ -25,7 +25,7 @@ public class ThreadController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateGroup(@RequestBody Thread thread){
+    public ResponseEntity<?> updateThread(@RequestBody Thread thread){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String msg = threadService.updateThread(thread.getTitle(), thread.getContent(), auth.getName());
         return ResponseEntity.ok().body(msg);

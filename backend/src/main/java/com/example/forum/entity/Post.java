@@ -32,4 +32,9 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "thread_id")
     private Thread thread;
+
+    public Post(int id, String content){
+        this.id = id;
+        this.content = content;
+    }
 }
