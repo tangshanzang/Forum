@@ -19,7 +19,6 @@ import java.util.List;
 public class GroupController {
 
     private final GroupService groupService;
-    private final UserService userService;
     @PostMapping("/create")
     public ResponseEntity<?> createGroup(@RequestBody Group group){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

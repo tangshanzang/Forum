@@ -79,14 +79,16 @@ export default {
         handleClick(e, name){
             if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                 if(e === "update"){
-                    if(this.newGroup.name == "[Deleted Group]"){
+                    if(name == "[Deleted Group]"){
                         this.message = "This group was already deleted in DB, can not be updated"
+                        this.isTryingToUpdate = false;
+                        this.isTryingToCreate = false;
                     }
                     else{
                         this.isTryingToUpdate = true;
                         this.isTryingToCreate = false;
                         this.newGroup.name = name;
-
+                        this.message = "";
                     }
             
                 }else{
