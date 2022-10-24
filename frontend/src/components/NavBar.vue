@@ -92,7 +92,7 @@
                     </label>
                     <input class="app__nav__profile__elementValue" id="password" name="password" v-model="user.password" @keydown="checkKeyDownAlphaNumeric($event)"/>
                 </div>
-                <button class="app__nav__profile__submit" @click="update()">
+                <button class="app__nav__profile__submit" @click="updated()">
                     Update
                 </button>
                 <button class="app__nav__profile__submit" @click="deleted()">
@@ -129,7 +129,9 @@
                         <p>{{group.name}}</p>
                         <p>{{group.description}}</p>
                         <!-- Threads -->
-                        
+                        <button v-if="group.owner.username===user.username">
+                            Delete Group
+                        </button>
                     </div>
                 </div>
             </div>
@@ -313,7 +315,7 @@ export default {
         }
     },
 
-    async update(){
+    async updated(){
         if(!this.user.name){
             this.message = "Please enter name"
         }
