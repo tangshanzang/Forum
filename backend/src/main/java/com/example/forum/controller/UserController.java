@@ -53,8 +53,7 @@ public class UserController {
         if (auth == null) {
             return ResponseEntity.badRequest().body("");
         } else {
-            userService.deleteUser(auth.getName());
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok().body(userService.deleteUser(auth.getName()));
         }
     }
 //    @GetMapping("/find")

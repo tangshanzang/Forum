@@ -189,7 +189,22 @@ export default {
         },
 
         async deleteUser(){
-
+            let res = await fetch('/api/user/delete', {
+                    method: 'DELETE',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+                    }
+                })
+                var msg = await res.text();
+                if(msg === "true"){
+                    this.message = "Your user have been deleted, hope we will see you again soon";
+                    this.logoutUser();
+                }else{
+                    this.getAccessTokenWithRefresh();
+                    if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
+                        this.deleteUser();
+                    }
+                }
         },
     }
 

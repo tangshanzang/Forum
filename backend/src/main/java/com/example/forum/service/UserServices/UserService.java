@@ -9,7 +9,7 @@ public interface UserService {
     String createUser(AppUser user);
     AppUser getUserByUsername(String username);
     List<AppUser> getUsers();
-    Boolean deleteUser(String username);
+    String deleteUser(String username);
 
     AppUserDTO currentUserDTO(String username);
 
