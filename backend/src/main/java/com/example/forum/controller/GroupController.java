@@ -19,15 +19,22 @@ import java.util.List;
 public class GroupController {
 
     private final GroupService groupService;
+    private final UserService userService;
     @PostMapping("/create")
     public ResponseEntity<?> createGroup(@RequestBody Group group){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok().body(groupService.createGroup(group, auth.getName()));
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<?> updateGroup(@RequestBody Group group){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String msg = groupService.updateGroup(group.getName(), group.getDescription(), auth.getName());
+        return ResponseEntity.ok().body(msg);
+    }
+
 
     public ResponseEntity<?> deleteGroup;
-    public ResponseEntity<?> updateGroup;
     public ResponseEntity<?> getGroupWithGroupName;
     public ResponseEntity<?> getGroupWithUserName;
 

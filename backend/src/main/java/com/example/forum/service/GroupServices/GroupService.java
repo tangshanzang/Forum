@@ -9,4 +9,6 @@ public interface GroupService {
     String createGroup(Group group, String username);
 
     List<Group> getGroups();
+
+    String updateGroup(String name, String description, String username);
 }

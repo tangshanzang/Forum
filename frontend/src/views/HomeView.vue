@@ -1,15 +1,20 @@
 <script setup>
-import NavBar from '../components/NavBar.vue'
+import Header from '../components/Header.vue'
+import Forum from '../components/Forum.vue'
 </script>
 
 <template>
-  <NavBar />
+  <main>
+    <Header />
+    <Forum />
+  </main>
 </template>
 
 <script>
 export default {
   components: {
-    NavBar
+    Header,
+    Forum
   }
 };
 </script>
