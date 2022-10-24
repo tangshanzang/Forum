@@ -3,6 +3,7 @@
 <template>
     <div class="app__nav__container">
         <div class="app__nav__bar">
+            <p @click="showForum = true">Forum</p>
             <router-link v-if="isAdmin" :to="'/admin'">admin</router-link>
             <p v-if="!isLoggedIn" @click="isRegister=false">Login</p>
             <p v-else @click="logout()">Logout</p>
@@ -99,26 +100,38 @@
                 </button>
             </div>
 
-            <div class="app__nav__myForum__container">
+            <div v-if="showForum" class="app__nav__myForum__container">
+                <h1>Forum</h1>
                 <button v-if="isLoggedIn" class="app__nav__myForum__newGroupBtn" @click="isCreatingGroup=true">Create New Group</button>
                 <div v-if="isLoggedIn && isCreatingGroup" class="app__nav__myForum__newGroup__form">
                     <div class="app__nav__myForum__elementContainer">
                         <label for="groupName" class="app__nav__myForum__elementTitle">
                             Group name
                         </label>
-                        <input class="app__nav__myForum__elementValue" id="groupName" name="groupName" v-model="groupName" @keydown="checkKeyDownAlphaNumeric($event)"/>
-                        <button class="app__nav__myForum__submitBtn" @click="createNewGroup()">
-                            Save Group
-                        </button>
-                    </div>
-                </div>
-
-                <!-- <div class="app__nav__myForum__GroupsContainer">
-                    <div :v-for="(group, i) in groups" class="app__nav__myForum__Group">
-                        <p>{{group.name}}</p>
+                        <input class="app__nav__myForum__elementValue" id="groupName" name="groupName" v-model="newGroup.groupName" @keydown="checkKeyDownAlphaNumeric($event)"/>
                         
                     </div>
-                </div> -->
+                        <div class="app__nav__myForum__elementContainer">
+                        <label for="description" class="app__nav__myForum__elementTitle">
+                            Description
+                        </label>
+                        <input class="app__nav__myForum__elementValue" id="description" name="description" v-model="newGroup.description" />
+                        
+                    </div>
+                    <button class="app__nav__myForum__submitBtn" @click="createNewGroup()">
+                            Save Group
+                    </button>
+                </div>
+
+                <div v-if="groups.length != 0" class="app__nav__myForum__GroupsContainer">
+                    <h1>Groups</h1>
+                    <div v-for="group in groups" :key="group.id" class="app__nav__myForum__Group">
+                        <p>{{group.name}}</p>
+                        <p>{{group.description}}</p>
+                        <!-- Threads -->
+                        
+                    </div>
+                </div>
             </div>
 
             
@@ -130,7 +143,12 @@
 
 <script>
 export default {
+    // async beforeMount(){
+    //     await this.getGroups();
+    // },
+
     async mounted() {
+        this.getGroups();
         if (this.accessToken != null) {
             this.isLoggedIn = true;
             let res = await fetch('/api/user/current',{
@@ -141,12 +159,11 @@ export default {
             })
             this.user = await res.json();
         }
-
-
     },
 
   data() {
       return {
+        showForum: false,
         isCreatingGroup: false,
         message: "",
         isAdmin: false,
@@ -166,16 +183,49 @@ export default {
             posts: []
         },
         groups: {},
-        groupName: ""
+        newGroup: {}
       }
   },
   methods: {
-    async getGroups(){
 
-    },
-    
     createNewGroup(){
-        this.isCreatingGroup = false;
+        if(!this.newGroup.name){
+            this.message = "Please name your group"
+        }
+        if(!this.newGroup.description){
+            this.newGroup.description = "No description"
+        }
+        this.postGroup();
+    },      
+
+    async postGroup(){
+        var groupDTO = {
+                "name": this.newGroup.groupName,
+                "description": this.newGroup.description,
+            }
+            let res = await fetch('/api/group/create', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json",
+            "Authorization": "Bearer " + this.accessToken },
+            body: JSON.stringify(groupDTO),
+            })
+            var msg = await res.text();
+            if(msg === "False"){
+                this.message = "Name is taken, please try an other"
+            }
+            else{
+                await this.getGroups();
+                this.message = "Group created";
+                this.isCreatingGroup = false;
+            }
+    },
+
+    async getGroups(){
+        let res = await fetch('/api/group/groups',{
+                method: 'GET',
+            })
+            this.groups = await res.json();
+            console.log(this.groups)
     },
 
     checkKeyDownAlphaNumeric(event) {

@@ -1,5 +1,6 @@
 package com.example.forum.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,5 +42,6 @@ public class Thread {
             mappedBy = "thread",
             cascade = CascadeType.ALL
     )
+    @JsonIgnore
     private Collection<Post> posts = new ArrayList<>();
 }

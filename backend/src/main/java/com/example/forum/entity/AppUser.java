@@ -1,5 +1,6 @@
 package com.example.forum.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,18 +39,21 @@ public class AppUser {
             mappedBy = "author",
             cascade = CascadeType.ALL
     )
+    @JsonIgnore
     private Collection<Thread> threads = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "author",
             cascade = CascadeType.ALL
     )
+    @JsonIgnore
     private Collection<Post> posts = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "owner",
             cascade = CascadeType.ALL
     )
+    @JsonIgnore
     private Collection<Group> groups = new ArrayList<>();
 
     private String status = "active";
