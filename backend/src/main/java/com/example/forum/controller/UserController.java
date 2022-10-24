@@ -43,7 +43,6 @@ public class UserController {
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestParam String name, @RequestParam String password){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(auth.getName());
         String msg = userService.updateUser(auth.getName(), name, password);
         return ResponseEntity.ok().body(msg);
     }

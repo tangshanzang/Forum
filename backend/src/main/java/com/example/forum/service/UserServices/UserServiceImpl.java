@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setPassword(passwordEncoder.encode(password));
         user.setName(name);
         userRepo.save(user);
-        return "Updated";
+        return "true";
     }
 
     @Override

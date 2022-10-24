@@ -76,6 +76,27 @@ export default {
             event.preventDefault();
             }
         },
+
+        async getCurrent(){
+            let res = await fetch('/api/user/current',{
+                    method: 'GET',
+                    headers: {
+                        "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+                        }
+                        }
+                )
+                if(res.status === 200){
+                    var user = await res.json();
+                    this.name = user.name;
+                    }
+                else{
+                    this.getAccessTokenWithRefresh();
+                    if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){  
+                        this.getCurrent();
+                    }
+                }
+        },
+
         async loginUser(){
             if(!this.username || !this.password){
                 this.message = "Fill username and password"
@@ -85,10 +106,11 @@ export default {
                 })
                     var token = await res.json();
                 if (!token["msg"]) {
-                    sessionStorage.setItem("Access_Token", token["access_token"])
-                    sessionStorage.setItem("Refresh_Token", token["refresh_token"])
+                    sessionStorage.setItem("access_token", token["access_token"])
+                    sessionStorage.setItem("refresh_token", token["refresh_token"])
                     this.message = "";
                     this.loggedIn = true;
+                    this.getCurrent();
                 }else{
                     this.message = "Wrong username/password!";
                 }
@@ -120,11 +142,50 @@ export default {
         },
 
         async updateUser(){
-
+            if(!this.password || !this.name){
+                this.message = "Fill name and password";
+            }else{
+                let res = await fetch('/api/user/update?name=' + this.name + '&password=' + this.password, {
+                    method: 'PUT',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+                    }
+                })
+                var msg = await res.text();
+                if(msg === "true"){
+                    this.message = "Your info have updated, try log in again with new info";
+                    this.logoutUser();
+                }else{
+                    this.getAccessTokenWithRefresh();
+                    if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
+                        this.updateUser();
+                    }
+                }
+            }
         },
 
-        async logoutUser(){
+        async getAccessTokenWithRefresh(){
+            let res = await fetch('/api/user/token/refresh',{
+                method: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("refresh_token")
+                }
+            })
+            var token = await res.json();
+            if (!token["msg"]) {
+                sessionStorage.setItem("access_token", token["access_token"])
+                sessionStorage.setItem("refresh_token", token["refresh_token"])
+            }else{
+                this.message = "Please try to logout and re login!";
+            }
+        },
 
+        logoutUser(){
+            sessionStorage.clear();
+            this.loggedIn = false;
+            this.username = "";
+            this.password = "";
+            this.name = "";
         },
 
         async deleteUser(){
