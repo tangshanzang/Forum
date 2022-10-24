@@ -19,7 +19,7 @@ import static javax.persistence.GenerationType.AUTO;
 public class Thread {
     @Id
     @GeneratedValue(strategy = AUTO)
-    private Long id;
+    private int id;
 
     private String title;
 
@@ -44,4 +44,9 @@ public class Thread {
     )
     @JsonIgnore
     private Collection<Post> posts = new ArrayList<>();
+
+    public Thread(String title, String content){
+        this.title = title;
+        this.content = content;
+    }
 }

@@ -16,7 +16,7 @@ import static javax.persistence.GenerationType.AUTO;
 public class Post {
     @Id
     @GeneratedValue(strategy = AUTO)
-    private Long id;
+    private int id;
 
     private String content;
 

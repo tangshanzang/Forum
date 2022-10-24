@@ -21,7 +21,7 @@ public class Group {
 
     @Id
     @GeneratedValue(strategy = AUTO)
-    private Long id;
+    private int id;
 
     private String name;
 

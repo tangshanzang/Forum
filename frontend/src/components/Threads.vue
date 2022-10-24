@@ -2,31 +2,31 @@
   <div class="app__group__container">
     <div class="app__group__container__header">
         <p v-if="message">{{message}}</p>
-        <h1 class="">Group</h1>
-        <button @click="handleClick('create', '')">Create Group</button>
+        <h1 class="">Thread</h1>
+        <button @click="handleClick('create', '')">Create Thread</button>
     </div>
     <div v-if="isTryingToUpdate||isTryingToCreate" class="app__group__container__content">
         <div v-if="isTryingToCreate" class="app__group__container__content__elementContainer">
             <label for="name" class="app__group__container__content__elementContainer__elementTitle">
-                Group name
+                Thread title
             </label>
-            <input class="app__group__container__content__elementContainer__elementValue" id="name" name="name" v-model="newGroup.name"/>
+            <input class="app__group__container__content__elementContainer__elementValue" id="name" name="name" v-model="newThread.title"/>
         </div>
 
         <div v-if="!isTryingToCreate" class="app__group__container__content__elementContainer">
             <label for="name" class="app__group__container__content__elementContainer__elementTitle">
-                Group name
+                Thread title
             </label>
             <p class="app__group__container__content__elementContainer__elementValue" id="name" name="name">
-                {{newGroup.name}}
+                {{newThread.title}}
             </p>
         </div>
 
         <div class="app__group__container__content__elementContainer">
             <label for="description" class="app__group__container__content__elementContainer__elementTitle">
-                Group description
+                Thread content
             </label>
-            <input class="app__group__container__content__elementContainer__elementValue" id="description" name="description" v-model="newGroup.description"/>
+            <input class="app__group__container__content__elementContainer__elementValue" id="description" name="description" v-model="newThread.content"/>
         </div>
 
         <button @click="handleSave()" class="app__group__container__content__button">
@@ -34,13 +34,13 @@
         </button>
     </div>
     <div class="app__group__container__content">
-        <div v-for="group in groups" :key="group.id" class="app__group__container__content__groupContainer">
+        <div v-for="thread in threads" :key="thread.id" class="app__group__container__content__groupContainer">
             <div class="app__group__container__content__groupContainer__group">
-                <p class="">{{ group.name }}</p>
-                <p class="">{{ group.description }}</p>
-                <button @click="handleClick('update', group.name)">Update Group</button>
-                <button @click="deleteGroup(group.name)">Delete Group</button>
-                <button @click="navigate(group.id)">Group's Threads</button>
+                <p class="">{{ thread.title }}</p>
+                <p class="">{{ thread.content }}</p>
+                <button @click="handleClick('update', thread.title)">Update Thread</button>
+                <button @click="deleteThread(thread.title)">Delete Thread</button>
+                <button @click="navigate(thread.id)">Thread's Posts</button>
             </div>
         </div>
     </div>
@@ -51,10 +51,10 @@
 export default {
     async beforeCreate() {
 
-        let res = await fetch('/api/group/groups',{
+        let res = await fetch('/api/thread/threadsOfGroup?groupId=' + this.$route.params.id,{
                 method: 'GET'
             })
-        this.groups = await res.json();
+        this.threads = await res.json();
     },
     data() {
         return {
@@ -63,37 +63,37 @@ export default {
             isTryingToUpdate: false,
             isTryingToCreate: false,
             name: '',
-            groups: [],
-            newGroup: {
-                name: "",
-                description: ""
+            threads: [],
+            newThread: {
+                title: "",
+                content: ""
             },
         }
     },
     methods:{
         navigate(id) {
-            this.$router.push('/group/' + id)
+            this.$router.push('/thread/' + id)
         },
          
         handleClick(e, name){
             if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                 if(e === "update"){
-                    if(name == "[Deleted Group]"){
-                        this.message = "This group was already deleted in DB, can not be updated"
+                    if(name == "[Deleted Thread]"){
+                        this.message = "This thread was already deleted in DB, can not be updated"
                         this.isTryingToUpdate = false;
                         this.isTryingToCreate = false;
                     }
                     else{
                         this.isTryingToUpdate = true;
                         this.isTryingToCreate = false;
-                        this.newGroup.name = name;
+                        this.newThread.title = name;
                         this.message = "";
                     }
             
                 }else{
                     this.isTryingToUpdate = false;
                     this.isTryingToCreate = true;
-                    this.newGroup.name = name;
+                    this.newThread.title = name;
             }}else{
                 this.message = "You need to log in first"
             }
@@ -101,86 +101,85 @@ export default {
 
         handleSave(){
             if(this.isTryingToCreate){
-                this.createGroup();
+                this.createThread();
             }else{
-                this.updateGroup();
+                this.updateThread();
             }
         },
 
-        async createGroup() {
-            if(!this.newGroup.name || !this.newGroup.description){
-                this.message = "Please fill all group info"
-            }else if(this.newGroup.name == "[Deleted Group]"){
-                this.message = "Invalid Group Name"
+        async createThread() {
+            if(!this.newThread.title || !this.newThread.content){
+                this.message = "Please fill all thread info"
+            }else if(this.newThread.title == "[Deleted Thread]"){
+                this.message = "Invalid Thread Title"
             }
             else{
 
-                let res = await fetch('/api/group/create', {
+                let res = await fetch('/api/thread/create?groupId=' + this.$route.params.id + '&title=' + this.newThread.title +
+                '&content=' + this.newThread.content, {
                     method: 'POST',
                     headers: {
-                        "Content-Type": "application/json",
                         "Authorization": "Bearer " + sessionStorage.getItem("access_token")
                     },
-                    body: JSON.stringify(this.newGroup)
                 })
                 var msg = await res.text();
     
-                if(msg == "Group Has Been Created"){
+                if(msg == "Thread Has Been Created"){
                     this.message = msg;
-                    this.groups = await this.fetchGroups();
-                }else if(msg == "Group Name Is Taken" || msg == "User Is Blocked"){
+                    this.threads = await this.fetchThreads();
+                }else if(msg == "Thread Title Is Taken" || msg == "User Is Blocked" || msg == "Group Is Blocked"){
                     this.message = msg;
                 }else if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                     this.getAccessTokenWithRefresh();
                     // double if cause the above method might force logout
                     if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
-                        this.createGroup();
+                        this.createThread();
                     }
                 }
             }
         },
 
-        async updateGroup() {
-            if(!this.newGroup.name || !this.newGroup.description){
-                this.message = "Please fill all group info"
-            }else if(this.newGroup.name == "[Deleted Group]"){
-                this.message = "This group was already deleted in DB, can not be updated"
+        async updateThread() {
+            if(!this.newThread.title || !this.newThread.content){
+                this.message = "Please fill all thread info"
+            }else if(this.newThread.title == "[Deleted Thread]"){
+                this.message = "This thread was already deleted in DB, can not be updated"
             }else{
-
-                let res = await fetch('/api/group/update?name=' + this.newGroup.name + '&description=' + this.description, {
+                // not needed to send as rest since i sent JSON but i don't want to waste time here anymore
+                let res = await fetch('/api/thread/update?title=' + this.newThread.title + '&content=' + this.newThread.content, {
                     method: 'PUT',
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": "Bearer " + sessionStorage.getItem("access_token")
                     },
-                    body: JSON.stringify(this.newGroup)
+                    body: JSON.stringify(this.newThread)
                 })
     
                 var msg = await res.text();
-                if(msg == "Group Has Been Updated"){
+                if(msg == "Thread Has Been Updated"){
                     this.message = msg;
-                    this.groups = await this.fetchGroups();
-                }else if(msg == "Group Name Is Taken" || msg == "User Is Blocked"
-                 || msg == "Group Is Blocked" || msg == "Group Does Not Exist"
-                 || msg == "You Can't Update Other's Groups"){
+                    this.threads = await this.fetchThreads();
+                }else if(msg == "Thread Title Is Taken" || msg == "User Is Blocked"
+                 || msg == "Thread Is Blocked" || msg == "Thread Does Not Exist"
+                 || msg == "You Can't Update Other's Threads"){
                     this.message = msg;
                 }else if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                     this.getAccessTokenWithRefresh();
                     // double if cause the above method might force logout
                     if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
-                        let res = await fetch('/api/group/update?name=' + this.newGroup.name + '&description=' + this.description, {
+                        let res = await fetch('/api/thread/update?title=' + this.newThread.title + '&content=' + this.newThread.content, {
                             method: 'PUT',
                             headers: {
                                 "Content-Type": "application/json",
                                 "Authorization": "Bearer " + sessionStorage.getItem("access_token")
                             },
-                            body: JSON.stringify(this.newGroup)
+                            body: JSON.stringify(this.newThread)
                         })
             
                         var msg = await res.text();
-                        if(msg == "Group Has Been Updated"){
+                        if(msg == "Thread Has Been Updated"){
                             this.message = msg;
-                            this.groups = await this.fetchGroups();
+                            this.threads = await this.fetchThreads();
                         }else{
                             this.message = msg;
                         }
@@ -190,13 +189,13 @@ export default {
             }
         },
 
-        async deleteGroup(groupName){
-            if(groupName == "[Deleted Group]"){
-                this.message = "This group was already deleted in DB, can not be deleted again"
+        async deleteThread(threadName){
+            if(threadName == "[Deleted Thread]"){
+                this.message = "This thread was already deleted in DB, can not be deleted again"
             }
             else{
 
-                let res = await fetch('/api/group/delete?name=' + groupName, {
+                let res = await fetch('/api/thread/delete?title=' + threadName, {
                         method: 'DELETE',
                         headers: {
                             "Authorization": "Bearer " + sessionStorage.getItem("access_token")
@@ -204,18 +203,18 @@ export default {
                     })
         
                     var msg = await res.text();
-                    if(msg == "Group Has Been Deleted"){
+                    if(msg == "Thread Has Been Deleted"){
                         this.message = msg;
-                        this.groups = await this.fetchGroups();
+                        this.threads = await this.fetchThreads();
                     }else if(msg == "User Is Blocked"
-                     || msg == "Group Is Blocked" || msg == "Group Does Not Exist"
-                     || msg == "You Can't Delete Other's Groups"){
+                     || msg == "Thread Is Blocked" || msg == "Thread Does Not Exist"
+                     || msg == "You Can't Delete Other's Threads"){
                         this.message = msg;
                     }else if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                         this.getAccessTokenWithRefresh();
                         // double if cause the above method might force logout
                         if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
-                            let res = await fetch('/api/group/delete?name=' + groupName, {
+                            let res = await fetch('/api/thread/delete?title=' + threadName, {
                                 method: 'DELETE',
                                 headers: {
                                     "Authorization": "Bearer " + sessionStorage.getItem("access_token")
@@ -223,9 +222,11 @@ export default {
                             })
                 
                             var msg = await res.text();
-                            if(msg == "Group Has Been Deleted"){
+                            if(msg == "Thread Has Been Deleted"){
                                 this.message = msg;
-                                this.groups = await this.fetchGroups();
+                                console.log(this.threads)
+                                this.threads = await this.fetchThreads();
+                                console.log(this.threads)
                             }else{
                                 this.message = msg;
                             }
@@ -252,8 +253,8 @@ export default {
             }
         },
 
-        async fetchGroups() {
-            let res = await fetch('/api/group/groups',{
+        async fetchThreads() {
+            let res = await fetch('/api/thread/threadsOfGroup?groupId=' + this.$route.params.id,{
                 method: 'GET'
             })
             return await res.json()
