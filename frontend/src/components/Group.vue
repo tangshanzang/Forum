@@ -3,10 +3,10 @@
     <div class="app__group__container__header">
         <p v-if="message">{{message}}</p>
         <h1 class="">Group</h1>
-        <button v-if="isLoggedIn" @click="handleClick('update')">Update Group</button>
-        <button v-if="isLoggedIn" @click="handleClick('create')">Create Group</button>
+        <button @click="handleClick('update')">Update Group</button>
+        <button @click="handleClick('create')">Create Group</button>
     </div>
-    <div v-if="isTryingToUpdate||isTryingToUpdate" class="app__group__container__content">
+    <div v-if="isTryingToUpdate||isTryingToCreate" class="app__group__container__content">
         <div class="app__group__container__content__elementContainer">
             <label for="name" class="app__group__container__content__elementContainer__elementTitle">
                 Group name
@@ -54,12 +54,15 @@ export default {
     },
     methods:{
         handleClick(e){
-            if(e === "update"){
-                this.isTryingToUpdate = true;
-                this.isTryingToCreate = false;
-            }else{
-                this.isTryingToUpdate = false;
-                this.isTryingToCreate = true;
+            if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
+                if(e === "update"){
+                    this.isTryingToUpdate = true;
+                    this.isTryingToCreate = false;
+                }else{
+                    this.isTryingToUpdate = false;
+                    this.isTryingToCreate = true;
+            }}else{
+                this.message = "You need to log in first"
             }
         },
 

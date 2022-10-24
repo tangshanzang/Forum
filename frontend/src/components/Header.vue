@@ -31,10 +31,6 @@
 
           <div v-if="loggedIn" class="app__header__container__loggedIn">
               <h2>You Are Now Logged In</h2>
-              <div class="app__header__container__loggedIn__elementContainer">
-                  <p class="app__header__container__loggedIn__elementContainer__title">Username</p>
-                  <p class="app__header__container__loggedIn__elementContainer__value">{{username}}</p>
-              </div>
                 <div class="app__header__container__loggedIn__elementContainer">
                     <label for="password" class="app__header__container__loggedIn__elementContainer__title">
                         Password
@@ -60,6 +56,30 @@
 
 <script>
 export default {
+    async beforeCreate() {
+
+        if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
+            let res = await fetch('/api/user/current',{
+                    method: 'GET',
+                    headers: {
+                        "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+                        }
+                        }
+                )
+                if(res.status === 200){
+                    var user = await res.json();
+                    this.name = user.name;
+                    this.loggedIn = true;
+                    }
+                else{
+                    this.getAccessTokenWithRefresh();
+                    if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){  
+                        this.getCurrent();
+                    }
+                }
+        }
+    },
+
     data() {
         return {
             message: '',
