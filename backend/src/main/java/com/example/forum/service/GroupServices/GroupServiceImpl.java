@@ -23,19 +23,23 @@ public class GroupServiceImpl implements GroupService{
     private final UserRepository userRepo;
     @Override
     public String createGroup(Group group, String username) {
-        String msg = "";
-        if(groupRepo.findByName(group.getName()) != null){
-            msg = "False";
-            return msg;
+        AppUser user = userRepo.findByUsername(username);
+
+        if (Objects.equals(user.getStatus(), "blocked")) {
+            return "User Is Blocked";
+        } else if (groupRepo.findByName(group.getName()) != null) {
+            return "Group Name Is Taken";
+        } else {
+            Group newGroup = new Group();
+            newGroup.setName(group.getName());
+            newGroup.setDescription(group.getDescription());
+            newGroup.setStatus("active");
+            newGroup.setCreatedTime(LocalDateTime.now());
+            newGroup.setOwner(user);
+            groupRepo.save(newGroup);
+
+            return "Group Has Been Created";
         }
-        AppUser owner = userRepo.findByUsername(username);
-
-        group.setCreatedTime(LocalDateTime.now());
-        group.setOwner(owner);
-        groupRepo.save(group);
-        msg = "true";
-
-        return msg;
     }
 
     @Override
@@ -57,7 +61,7 @@ public class GroupServiceImpl implements GroupService{
         }else if (groupRepo.findByName(name) != null) {
             return "Group Name Is Taken";
         }else if (!Objects.equals(group.getOwner().getId(), user.getId())) {
-            return "You Can't Delete Other's Groups";
+            return "You Can't Update Other's Groups";
         }else{
             group.setName(name);
             group.setDescription(description);

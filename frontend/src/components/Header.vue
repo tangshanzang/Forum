@@ -59,12 +59,13 @@ export default {
     async beforeCreate() {
 
         if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
+            
             let res = await fetch('/api/user/current',{
                     method: 'GET',
                     headers: {
                         "Authorization": "Bearer " + sessionStorage.getItem("access_token")
                         }
-                        }
+                    }
                 )
                 if(res.status === 200){
                     var user = await res.json();

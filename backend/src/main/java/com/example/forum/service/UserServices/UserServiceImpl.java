@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public String deleteUser(String username) {
         AppUser user = userRepo.findByUsername(username);
         user.setUsername("[Deleted]");
+        user.setStatus("deleted");
         return "true";
     }
 

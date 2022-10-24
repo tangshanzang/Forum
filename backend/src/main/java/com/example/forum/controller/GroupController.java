@@ -23,7 +23,8 @@ public class GroupController {
     @PostMapping("/create")
     public ResponseEntity<?> createGroup(@RequestBody Group group){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return ResponseEntity.ok().body(groupService.createGroup(group, auth.getName()));
+        String msg = groupService.createGroup(group, auth.getName());
+        return ResponseEntity.ok().body(msg);
     }
 
     @PutMapping("/update")

@@ -83,14 +83,17 @@ export default {
                 },
                 body: JSON.stringify(this.newGroup)
             })
+            var msg = await res.text();
 
-            if(res.status === 200){
-                this.message = await res.text();
+            if(msg == "Group Has Been Created"){
+                this.message = msg;
                 this.groups = await this.fetchGroups();
-            }else if(res.status === 403 && (sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token"))){
+            }else if(msg == "Group Name Is Taken" || msg == "User Is Blocked"){
+                this.message = msg;
+            }else if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                 this.getAccessTokenWithRefresh();
                 // double if cause the above method might force logout
-                if(res.status === 403 && (sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token"))){
+                if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){
                     this.createGroup();
                 }
             }
@@ -129,8 +132,8 @@ export default {
             })
             var token = await res.json();
             if (!token["msg"]) {
-                sessionStorage.setItem("Access_Token", token["access_token"])
-                sessionStorage.setItem("Refresh_Token", token["refresh_token"])
+                sessionStorage.setItem("access_token", token["access_token"])
+                sessionStorage.setItem("refresh_token", token["refresh_token"])
             }else{
                 this.message = "Please try to logout and re login!";
             }
