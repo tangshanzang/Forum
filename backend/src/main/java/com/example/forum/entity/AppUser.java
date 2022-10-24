@@ -31,8 +31,8 @@ public class AppUser {
     @Column(name = "created_time")
     private LocalDateTime createdTime;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Collection<Role> roles = new ArrayList<>();
+
+    private String role = "ROLE_USER";
 
     @OneToMany(
             mappedBy = "author",
@@ -54,10 +54,10 @@ public class AppUser {
 
     private String status = "active";
 
-//    public AppUser(String username, String password, String name) {
-//        this.username = username;
-//        this.password = password;
-//        this.name = name;
-//        createdTime = LocalDateTime.now();
-//    }
+    public AppUser(String username, String password, String name) {
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        createdTime = LocalDateTime.now();
+    }
 }

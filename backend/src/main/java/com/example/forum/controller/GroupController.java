@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/group")
-@CrossOrigin(origins = "http://localhost:8080")
+@RequestMapping("/api/group")
+@CrossOrigin
 public class GroupController {
 
     public ResponseEntity<Group> createGroup;

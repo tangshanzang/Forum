@@ -17,7 +17,7 @@ public class AppUserDTO {
     private String name;
     private String status;
     private String createdTime;
-    private Collection<String> roles = new ArrayList<>();
+    private String role;
     private Collection<Thread> threads = new ArrayList<>();
     private Collection<Post> posts = new ArrayList<>();
     private Collection<Group> groups = new ArrayList<>();
@@ -27,12 +27,7 @@ public class AppUserDTO {
         status = user.getStatus();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         createdTime = user.getCreatedTime().format(formatter);
-
-        for (Role role : user.getRoles())
-        {
-            roles.add(role.getName());
-        }
-
+        role = user.getRole();
         threads = user.getThreads();
         posts = user.getPosts();
         groups = user.getGroups();

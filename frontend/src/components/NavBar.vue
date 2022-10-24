@@ -1,10 +1,11 @@
+
+
 <template>
     <div class="app__nav__container">
         <div class="app__nav__bar">
-            <router-link :to="'/'">Home</router-link>
             <router-link v-if="isAdmin" :to="'/admin'">admin</router-link>
             <p v-if="!isLoggedIn" @click="isRegister=false">Login</p>
-            <p v-else @click="isRegister=false">Logout</p>
+            <p v-else @click="logout()">Logout</p>
             <p v-if="!isLoggedIn" @click="isRegister=true">Register</p>
         </div>
         <div class="app__nav__message" v-if="message">
@@ -25,6 +26,25 @@
             </div>
             <button class="app__nav__loginBar__submit" @click="login()">
                 Login
+            </button>
+        </div>
+
+        <div class="app__nav__loginBar" v-if="isRegister && !isLoggedIn">
+            <h1>Register</h1>
+            <div class="app__nav__loginBar__elementContainer">
+                <p class="app__nav__loginBar__elementTitle">Username</p>
+                <input class="app__nav__loginBar__elementValue" type="text" v-model="user.username" @keydown="checkKeyDownAlphaNumeric($event)"/>
+            </div>
+            <div class="app__nav__loginBar__elementContainer">
+                <p class="app__nav__loginBar__elementTitle">Password</p>
+                <input class="app__nav__loginBar__elementValue" type="text" v-model="user.password" @keydown="checkKeyDownAlphaNumeric($event)"/>
+            </div>
+            <div class="app__nav__loginBar__elementContainer">
+                <p class="app__nav__loginBar__elementTitle">Name</p>
+                <input class="app__nav__loginBar__elementValue" type="text" v-model="user.name" @keydown="checkKeyDownAlphaNumeric($event)"/>
+            </div>
+            <button class="app__nav__loginBar__submit" @click="register()">
+                Register
             </button>
         </div>
 
@@ -49,10 +69,10 @@
 
                 <div class="app__nav__profile__elementContainer">
                     <p class="app__nav__profile__elementTitle">
-                        Roles
+                        Role
                     </p>
                     <p class="app__nav__profile__elementValue">
-                        {{ roleFormat(user.roles) }}
+                        {{ user.role }}
                     </p>
                 </div>
 
@@ -78,6 +98,30 @@
                     Delete
                 </button>
             </div>
+
+            <div class="app__nav__myForum__container">
+                <button v-if="isLoggedIn" class="app__nav__myForum__newGroupBtn" @click="isCreatingGroup=true">Create New Group</button>
+                <div v-if="isLoggedIn && isCreatingGroup" class="app__nav__myForum__newGroup__form">
+                    <div class="app__nav__myForum__elementContainer">
+                        <label for="groupName" class="app__nav__myForum__elementTitle">
+                            Group name
+                        </label>
+                        <input class="app__nav__myForum__elementValue" id="groupName" name="groupName" v-model="groupName" @keydown="checkKeyDownAlphaNumeric($event)"/>
+                        <button class="app__nav__myForum__submitBtn" @click="createNewGroup()">
+                            Save Group
+                        </button>
+                    </div>
+                </div>
+
+                <!-- <div class="app__nav__myForum__GroupsContainer">
+                    <div :v-for="(group, i) in groups" class="app__nav__myForum__Group">
+                        <p>{{group.name}}</p>
+                        
+                    </div>
+                </div> -->
+            </div>
+
+            
         </div>
 
 
@@ -97,15 +141,15 @@ export default {
             })
             this.user = await res.json();
         }
+
+
     },
-
-
 
   data() {
       return {
+        isCreatingGroup: false,
         message: "",
         isAdmin: false,
-        isSuperAdmin: false,
         isLoggedIn: false,
         isRegister: false,
         accessToken: sessionStorage.getItem("Access_Token"),
@@ -116,12 +160,25 @@ export default {
             password: "",
             createdTime: "",
             status: "",
-            roles: ""
+            roles: "",
+            groups: [],
+            threads: [],
+            posts: []
         },
+        groups: {},
+        groupName: ""
       }
   },
   methods: {
-      checkKeyDownAlphaNumeric(event) {
+    async getGroups(){
+
+    },
+    
+    createNewGroup(){
+        this.isCreatingGroup = false;
+    },
+
+    checkKeyDownAlphaNumeric(event) {
       if (!/[a-zA-Z0-9\s]/.test(event.key)) {
         this.ignoredValue = event.key ? event.key : "";
         event.preventDefault();
@@ -144,10 +201,64 @@ export default {
             this.refreshToken = msg["refresh_token"];
             this.isLoggedIn = true;
             this.message = "";
-            this.getCurrent();
+            // getCurrent
+                let res = await fetch('/api/user/current',{
+                    method: 'GET',
+                    headers: {
+                        "Authorization": "Bearer " + this.accessToken
+                    }
+                }
+                    )
+                this.user = await res.json();
+                if(this.user.role === "ROLE_ADMIN")
+                this.isAdmin = true;
             }
             else{
                 this.message = "Wrong username or password";
+            }
+        }
+    },
+
+    logout(){
+        sessionStorage.clear();
+        this.message = "user logged out";
+        this.isLoggedIn = false;
+        this.isAdmin = false;
+        this.isRegister = false;
+        this.user =  
+        {
+            name: "",
+            username: "",
+            password: "",
+            createdTime: "",
+            status: "",
+            roles: ""
+        };
+
+    },
+
+    async register(){
+        if(!this.user.password || !this.user.username || !this.user.name){
+            this.message = "Information can not be blank"
+        }
+        else{
+            var userDTO = {
+                "username": this.user.username,
+                "password": this.user.password,
+                "name": this.user.name
+            }
+            let res = await fetch('/api/user/create', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userDTO),
+            })
+            var msg = await res.text();
+            if(msg === "False"){
+                this.message = "Username is taken, please try an other"
+            }
+            else{
+                await this.login();
+            }
             }
         }
     },
@@ -198,14 +309,8 @@ export default {
             }
                 )
         this.user = await res.json();
-        for (let index = 0; index < this.user.roles.length; index++) {
-            if(this.user.roles[index] === "ROLES_ADMIN"){
-                this.isAdmin = true;
-            }
-            else if(this.user.roles[index] === "ROLES_SUPERADMIN"){
-                this.isSuperAdmin = true;
-            }
-        }
+        if(this.user.role === "ROLE_ADMIN")
+        this.isAdmin = true;
     },
 
     roleFormat(list){
@@ -216,7 +321,7 @@ export default {
         }
         return newList;
     }
-  }
+  
 }
 </script>
 
