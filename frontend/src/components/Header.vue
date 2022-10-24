@@ -3,6 +3,7 @@
       <div class="app__header__container">
           <p class="app__header__container__message" v-if="message">{{ message }}</p>
             <div v-if="!loggedIn" class="app__header__container__notLoggedIn">
+                <h2>Welcome, Visitor</h2>
                 <div class="app__header__container__notLoggedIn__elementContainer">
                     <label for="username" class="app__header__container__notLoggedIn__elementContainer__title">
                         Username
@@ -29,6 +30,7 @@
             </div>
 
           <div v-if="loggedIn" class="app__header__container__loggedIn">
+              <h2>You Are Now Logged In</h2>
               <div class="app__header__container__loggedIn__elementContainer">
                   <p class="app__header__container__loggedIn__elementContainer__title">Username</p>
                   <p class="app__header__container__loggedIn__elementContainer__value">{{username}}</p>
@@ -86,6 +88,7 @@ export default {
                     sessionStorage.setItem("Access_Token", token["access_token"])
                     sessionStorage.setItem("Refresh_Token", token["refresh_token"])
                     this.message = "";
+                    this.loggedIn = true;
                 }else{
                     this.message = "Wrong username/password!";
                 }
@@ -93,7 +96,27 @@ export default {
         },
 
         async registerUser(){
+            if(!this.username || !this.password || !this.name){
+                this.message = "Fill username, password and name"
+            }else{
+                var userDTO = {
+                    "username": this.username,
+                    "password": this.password,
+                    "name": this.name
+                }
 
+                let res = await fetch('/api/user/create', {
+                    method: 'POST',
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(userDTO),
+                })
+                var msg = await res.text();
+                if(msg === "false"){
+                    this.message = "Username is taken"
+                }else{
+                    this.loginUser();
+                }
+            }
         },
 
         async updateUser(){
