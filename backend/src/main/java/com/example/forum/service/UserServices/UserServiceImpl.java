@@ -4,6 +4,8 @@ import com.example.forum.dto.AppUserDTO;
 import com.example.forum.entity.AppUser;
 import com.example.forum.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class UserServiceImpl implements UserService, UserDetailsService {
+    PolicyFactory santitizer = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     @Override
@@ -31,6 +34,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             msg = "False";
             return msg;
         }
+        user.setUsername(santitizer.sanitize(user.getUsername()));
+        user.setName(santitizer.sanitize(user.getName()));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedTime(LocalDateTime.now());
         userRepo.save(user);

@@ -9,6 +9,8 @@ import com.example.forum.repository.PostRepository;
 import com.example.forum.repository.ThreadRepository;
 import com.example.forum.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,6 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class PostServiceImpl implements  PostService{
+    PolicyFactory santitizer = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
 
     private final PostRepository postRepo;
     private final ThreadRepository threadRepo;
@@ -38,7 +41,7 @@ public class PostServiceImpl implements  PostService{
             Post post = new Post();
             post.setCreatedTime(LocalDateTime.now());
             post.setStatus("active");
-            post.setContent(content);
+            post.setContent(santitizer.sanitize(content));
             post.setThread(thread.get());
             post.setAuthor(user);
             postRepo.save(post);
@@ -60,7 +63,7 @@ public class PostServiceImpl implements  PostService{
         }else if (!Objects.equals(post.get().getAuthor().getId(), user.getId())) {
             return "You Can't Update Other's Post";
         }else{
-            post.get().setContent(content);
+            post.get().setContent(santitizer.sanitize(content));
             postRepo.save(post.get());
             return "Post Has Been Updated";
         }

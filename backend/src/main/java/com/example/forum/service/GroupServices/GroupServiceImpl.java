@@ -5,6 +5,8 @@ import com.example.forum.entity.Group;
 import com.example.forum.repository.GroupRepository;
 import com.example.forum.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Transactional
 public class GroupServiceImpl implements GroupService{
+    PolicyFactory santitizer = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
 
     private final GroupRepository groupRepo;
     private final UserRepository userRepo;
@@ -31,8 +34,8 @@ public class GroupServiceImpl implements GroupService{
             return "Group Name Is Taken";
         } else {
             Group newGroup = new Group();
-            newGroup.setName(group.getName());
-            newGroup.setDescription(group.getDescription());
+            newGroup.setName(santitizer.sanitize(group.getName()));
+            newGroup.setDescription(santitizer.sanitize(group.getDescription()));
             newGroup.setStatus("active");
             newGroup.setCreatedTime(LocalDateTime.now());
             newGroup.setOwner(user);
@@ -59,7 +62,7 @@ public class GroupServiceImpl implements GroupService{
         }else if (!Objects.equals(group.getOwner().getId(), user.getId())) {
             return "You Can't Update Other's Groups";
         }else{
-            group.setDescription(description);
+            group.setDescription(santitizer.sanitize(description));
             return "Group Has Been Updated";
         }
     }

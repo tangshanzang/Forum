@@ -7,6 +7,8 @@ import com.example.forum.repository.GroupRepository;
 import com.example.forum.repository.ThreadRepository;
 import com.example.forum.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,6 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class ThreadServiceImpl implements ThreadService{
+    PolicyFactory santitizer = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
 
     private final GroupRepository groupRepo;
     private final ThreadRepository threadRepo;
@@ -37,8 +40,8 @@ public class ThreadServiceImpl implements ThreadService{
             return "Thread Title Is Taken";
         } else {
             Thread thread = new Thread();
-            thread.setTitle(title);
-            thread.setContent(content);
+            thread.setTitle(santitizer.sanitize(title));
+            thread.setContent(santitizer.sanitize(content));
             thread.setCreatedTime(LocalDateTime.now());
             thread.setStatus("active");
             thread.setAuthor(user);
@@ -72,7 +75,7 @@ public class ThreadServiceImpl implements ThreadService{
         }else if (!Objects.equals(thread.getAuthor().getName(), user.getName())) {
             return "You Can't Update Other's Thread";
         }else{
-            thread.setContent(content);
+            thread.setContent(santitizer.sanitize(content));
             threadRepo.save(thread);
             return "Thread Has Been Updated";
         }
