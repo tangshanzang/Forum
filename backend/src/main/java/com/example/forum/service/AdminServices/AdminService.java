@@ -15,4 +15,9 @@ public interface AdminService {
     String unBlockThread(String adminUsername, String threadTitle);
     String deleteThread(String adminUsername, String threadTitle);
 
+
+    String blockPost(String adminUsername, int postId);
+    String unBlockPost(String adminUsername, int postId);
+    String deletePost(String adminUsername, int postId);
+
 }

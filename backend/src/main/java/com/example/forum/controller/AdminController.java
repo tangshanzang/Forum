@@ -73,8 +73,21 @@ public class AdminController {
     }
 
     // post
-    public ResponseEntity<?> blockPost;
-    public ResponseEntity<?> unblockPost;
-    public ResponseEntity<?> restorePost;
-    public ResponseEntity<?> adminDeletePost;
+    @PutMapping("/blockPost")
+    public ResponseEntity<?> blockPost(@RequestParam int postId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.blockPost(auth.getName(), postId));
+    }
+
+    @PutMapping("/unBlockPost")
+    public ResponseEntity<?> unBlockPost(@RequestParam int postId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.unBlockPost(auth.getName(), postId));
+    }
+
+    @DeleteMapping("/deletePost")
+    public ResponseEntity<?> deletePost(@RequestParam int postId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.deletePost(auth.getName(), postId));
+    }
 }

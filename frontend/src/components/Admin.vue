@@ -49,6 +49,22 @@
         </div>
     </div>
 
+        <div class="app__admin__container__posts">
+        <div class="app__admin__container__posts__input">
+            <label for="postId" class="app__admin__container__posts__input__title">
+                Post ID
+            </label>
+            <input class="app__admin__container__posts__input_value" id="postId" name="postId" v-model="postId"
+            type="number" @input="postId = Math.round(postId)"
+            @keydown="checkKeyDownAlphaNumeric($event)"/>
+        </div>
+        <div class="app__admin__container__posts__btn">
+            <button @click="deleteOtherPost()">delete</button>
+            <button @click="blockPost()">block</button>
+            <button @click="unBlockPost()">unblock</button>
+        </div>
+    </div>
+
   </div>
 </template>
 
@@ -60,7 +76,7 @@ export default {
       username: '',
       groupName: '',
       threadTitle: '',
-
+      postId: null
     }
   },
 
@@ -332,6 +348,93 @@ export default {
           this.getAccessTokenWithRefresh();
           if(sessionStorage.getItem("access_token")){
               let res = await fetch('/api/admin/unBlockThread?title=' + this.threadTitle, {
+                    method: 'PUT',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+                })
+                if(res.status == 200){
+                    this.message = await res.text();
+                }else{
+                    this.message = "You are not logged in";
+                }
+          }else{
+              this.message = "You are not logged in";
+          }
+      }
+    },
+
+    async deleteOtherPost(){
+        let res = await fetch('/api/admin/deletePost?id=' + this.postId, {
+        method: 'DELETE',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+      })
+      if(res.status == 200){
+          this.message = await res.text();
+      }else{
+          this.getAccessTokenWithRefresh();
+          if(sessionStorage.getItem("access_token")){
+              let res = await fetch('/api/admin/deletePost?id=' + this.postId, {
+                    method: 'DELETE',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+                })
+                if(res.status == 200){
+                    this.message = await res.text();
+                }else{
+                    this.message = "You are not logged in";
+                }
+          }else{
+              this.message = "You are not logged in";
+          }
+      }
+    },
+
+    async blockThread(){
+        let res = await fetch('/api/admin/blockPost?id=' + this.postId, {
+        method: 'PUT',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+      })
+      if(res.status == 200){
+          this.message = await res.text();
+      }else{
+          this.getAccessTokenWithRefresh();
+          if(sessionStorage.getItem("access_token")){
+              let res = await fetch('/api/admin/blockPost?id=' + this.postId, {
+                    method: 'PUT',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+                })
+                if(res.status == 200){
+                    this.message = await res.text();
+                }else{
+                    this.message = "You are not logged in";
+                }
+          }else{
+              this.message = "You are not logged in";
+          }
+      }
+    },
+
+    async unBlockThread(){
+        let res = await fetch('/api/admin/unBlockPost?id=' + this.postId, {
+        method: 'PUT',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+      })
+      if(res.status == 200){
+          this.message = await res.text();
+      }else{
+          this.getAccessTokenWithRefresh();
+          if(sessionStorage.getItem("access_token")){
+              let res = await fetch('/api/admin/unBlockPost?id=' + this.postId, {
                     method: 'PUT',
                     headers: {
                     "Authorization": "Bearer " + sessionStorage.getItem("access_token")
