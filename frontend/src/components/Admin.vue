@@ -34,6 +34,21 @@
         </div>
     </div>
 
+    <div class="app__admin__container__threads">
+        <div class="app__admin__container__threads__input">
+            <label for="title" class="app__admin__container__threads__input__title">
+                Thread Title
+            </label>
+            <input class="app__admin__container__threads__input_value" id="title" name="title" v-model="threadTitle"
+            @keydown="checkKeyDownAlphaNumeric($event)"/>
+        </div>
+        <div class="app__admin__container__threads__btn">
+            <button @click="deleteOtherThread()">delete</button>
+            <button @click="blockThread()">block</button>
+            <button @click="unBlockThread()">unblock</button>
+        </div>
+    </div>
+
   </div>
 </template>
 
@@ -44,6 +59,7 @@ export default {
       message: '',
       username: '',
       groupName: '',
+      threadTitle: '',
 
     }
   },
@@ -229,6 +245,93 @@ export default {
           this.getAccessTokenWithRefresh();
           if(sessionStorage.getItem("access_token")){
               let res = await fetch('/api/admin/unBlockGroup?name=' + this.groupName, {
+                    method: 'PUT',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+                })
+                if(res.status == 200){
+                    this.message = await res.text();
+                }else{
+                    this.message = "You are not logged in";
+                }
+          }else{
+              this.message = "You are not logged in";
+          }
+      }
+    },
+
+    async deleteOtherThread(){
+        let res = await fetch('/api/admin/deleteThread?title=' + this.threadTitle, {
+        method: 'DELETE',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+      })
+      if(res.status == 200){
+          this.message = await res.text();
+      }else{
+          this.getAccessTokenWithRefresh();
+          if(sessionStorage.getItem("access_token")){
+              let res = await fetch('/api/admin/deleteThread?title=' + this.threadTitle, {
+                    method: 'DELETE',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+                })
+                if(res.status == 200){
+                    this.message = await res.text();
+                }else{
+                    this.message = "You are not logged in";
+                }
+          }else{
+              this.message = "You are not logged in";
+          }
+      }
+    },
+
+    async blockThread(){
+        let res = await fetch('/api/admin/blockThread?title=' + this.threadTitle, {
+        method: 'PUT',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+      })
+      if(res.status == 200){
+          this.message = await res.text();
+      }else{
+          this.getAccessTokenWithRefresh();
+          if(sessionStorage.getItem("access_token")){
+              let res = await fetch('/api/admin/blockThread?title=' + this.threadTitle, {
+                    method: 'PUT',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+                })
+                if(res.status == 200){
+                    this.message = await res.text();
+                }else{
+                    this.message = "You are not logged in";
+                }
+          }else{
+              this.message = "You are not logged in";
+          }
+      }
+    },
+
+    async unBlockThread(){
+        let res = await fetch('/api/admin/unBlockThread?title=' + this.threadTitle, {
+        method: 'PUT',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+      })
+      if(res.status == 200){
+          this.message = await res.text();
+      }else{
+          this.getAccessTokenWithRefresh();
+          if(sessionStorage.getItem("access_token")){
+              let res = await fetch('/api/admin/unBlockThread?title=' + this.threadTitle, {
                     method: 'PUT',
                     headers: {
                     "Authorization": "Bearer " + sessionStorage.getItem("access_token")

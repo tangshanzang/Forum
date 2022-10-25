@@ -2,7 +2,9 @@ package com.example.forum.service.AdminServices;
 
 import com.example.forum.entity.AppUser;
 import com.example.forum.entity.Group;
+import com.example.forum.entity.Thread;
 import com.example.forum.repository.GroupRepository;
+import com.example.forum.repository.ThreadRepository;
 import com.example.forum.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ public class AdminServiceimpl implements AdminService{
 
     private final UserRepository userRepo;
     private final GroupRepository groupRepo;
+    private final ThreadRepository threadRepo;
 
     @Override
     public String blockUser(String adminUsername, String targetUsername) {
@@ -154,6 +157,75 @@ public class AdminServiceimpl implements AdminService{
             group.setStatus("deleted");
             groupRepo.save(group);
             return "Group Has Been Deleted";
+        }
+    }
+
+    @Override
+    public String blockThread(String adminUsername, String threadTitle) {
+        AppUser admin = userRepo.findByUsername(adminUsername);
+
+        if (!Objects.equals(admin.getRole(), "ROLE_ADMIN")) {
+            return "Only Admin Is Allowed To Block";
+        }
+
+        Thread thread = threadRepo.findByTitle(threadTitle);
+
+        if (thread == null) {
+            return "Thread Does Not Exist";
+        } else if (Objects.equals(thread.getStatus(), "blocked")) {
+            return "Thread Is Already Blocked";
+        } else if (Objects.equals(thread.getStatus(), "deleted")) {
+            return "Thread Is Deleted, Can't Block Deleted Thread";
+        } else {
+            thread.setStatus("blocked");
+            threadRepo.save(thread);
+            return "Thread Has Been Blocked";
+        }
+    }
+
+    @Override
+    public String unBlockThread(String adminUsername, String threadTitle) {
+        AppUser admin = userRepo.findByUsername(adminUsername);
+
+        if (!Objects.equals(admin.getRole(), "ROLE_ADMIN")) {
+            return "Only Admin Is Allowed To unBlock";
+        }
+
+        Thread thread = threadRepo.findByTitle(threadTitle);
+
+        if (thread == null) {
+            return "Thread Does Not Exist";
+        } else if (Objects.equals(thread.getStatus(), "active")) {
+            return "Thread Was Not Blocked";
+        } else if (Objects.equals(thread.getStatus(), "deleted")) {
+            return "Thread Is Deleted, Can't unBlock Deleted Thread";
+        } else {
+            thread.setStatus("blocked");
+            threadRepo.save(thread);
+            return "Thread Has Been unBlocked";
+        }
+    }
+
+    @Override
+    public String deleteThread(String adminUsername, String threadTitle) {
+        AppUser admin = userRepo.findByUsername(adminUsername);
+
+        if (!Objects.equals(admin.getRole(), "ROLE_ADMIN")) {
+            return "Only Admin Is Allowed To Delete Others";
+        }
+
+        Thread thread = threadRepo.findByTitle(threadTitle);
+
+        if (thread == null) {
+            return "Thread Does Not Exist";
+        } else if (Objects.equals(thread.getStatus(), "blocked")) {
+            return "Thread Is Blocked, Can't Delete Blocked Thread";
+        } else if (Objects.equals(thread.getStatus(), "deleted")) {
+            return "Thread Is Already Deleted";
+        } else {
+            thread.setStatus("deleted");
+            threadRepo.save(thread);
+            return "Thread Has Been Deleted";
         }
     }
 

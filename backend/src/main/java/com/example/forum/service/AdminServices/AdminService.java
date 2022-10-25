@@ -11,4 +11,8 @@ public interface AdminService {
     String unBlockGroup(String adminUsername, String groupName);
     String deleteGroup(String adminUsername, String groupName);
 
+    String blockThread(String adminUsername, String threadTitle);
+    String unBlockThread(String adminUsername, String threadTitle);
+    String deleteThread(String adminUsername, String threadTitle);
+
 }

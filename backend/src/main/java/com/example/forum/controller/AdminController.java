@@ -54,10 +54,23 @@ public class AdminController {
     }
 
     // thread
-    public ResponseEntity<?> blockThread;
-    public ResponseEntity<?> unblockThread;
-    public ResponseEntity<?> restoreThread;
-    public ResponseEntity<?> adminDeleteThread;
+    @PutMapping("/blockThread")
+    public ResponseEntity<?> blockThread(@RequestParam String title){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.blockThread(auth.getName(), title));
+    }
+
+    @PutMapping("/unBlockThread")
+    public ResponseEntity<?> unBlockThread(@RequestParam String title){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.unBlockThread(auth.getName(), title));
+    }
+
+    @DeleteMapping("/deleteThread")
+    public ResponseEntity<?> deleteThread(@RequestParam String title){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.deleteThread(auth.getName(), title));
+    }
 
     // post
     public ResponseEntity<?> blockPost;
