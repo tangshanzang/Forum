@@ -16,29 +16,42 @@ public class AdminController {
     private final AdminService adminService;
 
     // users
-    @PutMapping("/block")
+    @PutMapping("/blockUser")
     public ResponseEntity<?> blockUser(@RequestParam String username){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok().body(adminService.blockUser(auth.getName(), username));
     }
 
-    @PutMapping("/unBlock")
+    @PutMapping("/unBlockUser")
     public ResponseEntity<?> unblockUser(@RequestParam String username){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok().body(adminService.unBlockUser(auth.getName(), username));
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/deleteUser")
     public ResponseEntity<?> adminDeleteUser(@RequestParam String username){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok().body(adminService.deleteUser(auth.getName(), username));
     }
 
     // group
-    public ResponseEntity<?> blockGroup;
-    public ResponseEntity<?> unblockGroup;
-    public ResponseEntity<?> restoreGroup;
-    public ResponseEntity<?> adminDeleteGroup;
+    @PutMapping("/blockGroup")
+    public ResponseEntity<?> blockGroup(@RequestParam String name){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.blockGroup(auth.getName(), name));
+    }
+
+    @PutMapping("/unBlockGroup")
+    public ResponseEntity<?> unblockGroup(@RequestParam String name){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.unBlockGroup(auth.getName(), name));
+    }
+
+    @DeleteMapping("/deleteGroup")
+    public ResponseEntity<?> adminDeleteGroup(@RequestParam String name){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.deleteGroup(auth.getName(), name));
+    }
 
     // thread
     public ResponseEntity<?> blockThread;

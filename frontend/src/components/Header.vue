@@ -122,6 +122,9 @@ export default {
                     if(user.role == "ROLE_ADMIN"){
                         this.isAdmin = true;
                     }
+                    if(user.status != "active"){
+                        this.logoutUser();
+                    }
                     }
                 else{
                     if(sessionStorage.getItem("access_token") || sessionStorage.getItem("refresh_token")){  

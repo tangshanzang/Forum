@@ -1,6 +1,8 @@
 package com.example.forum.service.AdminServices;
 
 import com.example.forum.entity.AppUser;
+import com.example.forum.entity.Group;
+import com.example.forum.repository.GroupRepository;
 import com.example.forum.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.Objects;
 public class AdminServiceimpl implements AdminService{
 
     private final UserRepository userRepo;
+    private final GroupRepository groupRepo;
 
     @Override
     public String blockUser(String adminUsername, String targetUsername) {
@@ -82,6 +85,75 @@ public class AdminServiceimpl implements AdminService{
             targetUser.setStatus("deleted");
             userRepo.save(targetUser);
             return "User Has Been Deleted";
+        }
+    }
+
+    @Override
+    public String blockGroup(String adminUsername, String groupName) {
+        AppUser admin = userRepo.findByUsername(adminUsername);
+
+        if (!Objects.equals(admin.getRole(), "ROLE_ADMIN")) {
+            return "Only Admin Is Allowed To Block";
+        }
+
+        Group group = groupRepo.findByName(groupName);
+
+        if (group == null) {
+            return "Group Does Not Exist";
+        } else if (Objects.equals(group.getStatus(), "blocked")) {
+            return "Group Is Already Blocked";
+        } else if (Objects.equals(group.getStatus(), "deleted")) {
+            return "Group Is Deleted, Can't Block Deleted Group";
+        } else {
+            group.setStatus("blocked");
+            groupRepo.save(group);
+            return "Group Has Been Blocked";
+        }
+    }
+
+    @Override
+    public String unBlockGroup(String adminUsername, String groupName) {
+        AppUser admin = userRepo.findByUsername(adminUsername);
+
+        if (!Objects.equals(admin.getRole(), "ROLE_ADMIN")) {
+            return "Only Admin Is Allowed To unBlock";
+        }
+
+        Group group = groupRepo.findByName(groupName);
+
+        if (group == null) {
+            return "Group Does Not Exist";
+        } else if (Objects.equals(group.getStatus(), "active")) {
+            return "Group Was Not Blocked";
+        } else if (Objects.equals(group.getStatus(), "deleted")) {
+            return "Group Is Deleted, Can't unBlock Deleted Group";
+        } else {
+            group.setStatus("blocked");
+            groupRepo.save(group);
+            return "Group Has Been unBlocked";
+        }
+    }
+
+    @Override
+    public String deleteGroup(String adminUsername, String groupName) {
+        AppUser admin = userRepo.findByUsername(adminUsername);
+
+        if (!Objects.equals(admin.getRole(), "ROLE_ADMIN")) {
+            return "Only Admin Is Allowed To Delete Others";
+        }
+
+        Group group = groupRepo.findByName(groupName);
+
+        if (group == null) {
+            return "Group Does Not Exist";
+        } else if (Objects.equals(group.getStatus(), "blocked")) {
+            return "Group Is Blocked, Can't Delete Blocked Group";
+        } else if (Objects.equals(group.getStatus(), "deleted")) {
+            return "Group Is Already Deleted";
+        } else {
+            group.setStatus("deleted");
+            groupRepo.save(group);
+            return "Group Has Been Deleted";
         }
     }
 

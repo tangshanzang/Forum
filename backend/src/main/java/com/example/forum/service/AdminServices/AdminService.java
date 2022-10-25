@@ -7,4 +7,8 @@ public interface AdminService {
 
     String deleteUser(String adminUsername, String targetUsername);
 
+    String blockGroup(String adminUsername, String groupName);
+    String unBlockGroup(String adminUsername, String groupName);
+    String deleteGroup(String adminUsername, String groupName);
+
 }

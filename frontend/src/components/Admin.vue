@@ -19,6 +19,21 @@
         </div>
     </div>
 
+    <div class="app__admin__container__groups">
+        <div class="app__admin__container__groups__input">
+            <label for="name" class="app__admin__container__groups__input__title">
+                Group Name
+            </label>
+            <input class="app__admin__container__groups__input_value" id="name" name="name" v-model="groupName"
+            @keydown="checkKeyDownAlphaNumeric($event)"/>
+        </div>
+        <div class="app__admin__container__groups__btn">
+            <button @click="deleteOtherGroup()">delete</button>
+            <button @click="blockGroup()">block</button>
+            <button @click="unBlockGroup()">unblock</button>
+        </div>
+    </div>
+
   </div>
 </template>
 
@@ -28,6 +43,8 @@ export default {
     return {
       message: '',
       username: '',
+      groupName: '',
+
     }
   },
 
@@ -40,7 +57,7 @@ export default {
     },
 
     async deleteOtherUser(){
-        let res = await fetch('/api/admin/delete?username=' + this.username, {
+        let res = await fetch('/api/admin/deleteUser?username=' + this.username, {
         method: 'DELETE',
         headers: {
                     "Authorization": "Bearer " + sessionStorage.getItem("access_token")
@@ -51,7 +68,7 @@ export default {
       }else{
           this.getAccessTokenWithRefresh();
           if(sessionStorage.getItem("access_token")){
-              let res = await fetch('/api/admin/delete?username=' + this.username, {
+              let res = await fetch('/api/admin/deleteUser?username=' + this.username, {
                     method: 'DELETE',
                     headers: {
                     "Authorization": "Bearer " + sessionStorage.getItem("access_token")
@@ -70,7 +87,7 @@ export default {
     },
 
     async blockUser(){
-        let res = await fetch('/api/admin/block?username=' + this.username, {
+        let res = await fetch('/api/admin/blockUser?username=' + this.username, {
         method: 'PUT',
         headers: {
                     "Authorization": "Bearer " + sessionStorage.getItem("access_token")
@@ -81,7 +98,7 @@ export default {
       }else{
           this.getAccessTokenWithRefresh();
           if(sessionStorage.getItem("access_token")){
-              let res = await fetch('/api/admin/block?username=' + this.username, {
+              let res = await fetch('/api/admin/blockUser?username=' + this.username, {
                     method: 'PUT',
                     headers: {
                     "Authorization": "Bearer " + sessionStorage.getItem("access_token")
@@ -99,7 +116,7 @@ export default {
     },
 
     async unBlockUser(){
-        let res = await fetch('/api/admin/unBlock?username=' + this.username, {
+        let res = await fetch('/api/admin/unBlockUser?username=' + this.username, {
         method: 'PUT',
         headers: {
                     "Authorization": "Bearer " + sessionStorage.getItem("access_token")
@@ -110,7 +127,7 @@ export default {
       }else{
           this.getAccessTokenWithRefresh();
           if(sessionStorage.getItem("access_token")){
-              let res = await fetch('/api/admin/unBlock?username=' + this.username, {
+              let res = await fetch('/api/admin/unBlockUser?username=' + this.username, {
                     method: 'PUT',
                     headers: {
                     "Authorization": "Bearer " + sessionStorage.getItem("access_token")
@@ -140,6 +157,95 @@ export default {
             sessionStorage.setItem("refresh_token", token["refresh_token"])
         }
     },
+
+    async deleteOtherGroup(){
+        let res = await fetch('/api/admin/deleteGroup?name=' + this.groupName, {
+        method: 'DELETE',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+      })
+      if(res.status == 200){
+          this.message = await res.text();
+      }else{
+          this.getAccessTokenWithRefresh();
+          if(sessionStorage.getItem("access_token")){
+              let res = await fetch('/api/admin/deleteGroup?name=' + this.groupName, {
+                    method: 'DELETE',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+                })
+                if(res.status == 200){
+                    this.message = await res.text();
+                }else{
+                    this.message = "You are not logged in";
+                }
+          }else{
+              this.message = "You are not logged in";
+          }
+      }
+    },
+
+    async blockGroup(){
+        let res = await fetch('/api/admin/blockGroup?name=' + this.groupName, {
+        method: 'PUT',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+      })
+      if(res.status == 200){
+          this.message = await res.text();
+      }else{
+          this.getAccessTokenWithRefresh();
+          if(sessionStorage.getItem("access_token")){
+              let res = await fetch('/api/admin/blockGroup?name=' + this.groupName, {
+                    method: 'PUT',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+                })
+                if(res.status == 200){
+                    this.message = await res.text();
+                }else{
+                    this.message = "You are not logged in";
+                }
+          }else{
+              this.message = "You are not logged in";
+          }
+      }
+    },
+
+    async unBlockGroup(){
+        let res = await fetch('/api/admin/unBlockGroup?name=' + this.groupName, {
+        method: 'PUT',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+      })
+      if(res.status == 200){
+          this.message = await res.text();
+      }else{
+          this.getAccessTokenWithRefresh();
+          if(sessionStorage.getItem("access_token")){
+              let res = await fetch('/api/admin/unBlockGroup?name=' + this.groupName, {
+                    method: 'PUT',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
+                })
+                if(res.status == 200){
+                    this.message = await res.text();
+                }else{
+                    this.message = "You are not logged in";
+                }
+          }else{
+              this.message = "You are not logged in";
+          }
+      }
+    },
+
+
   }
 }
 </script>
