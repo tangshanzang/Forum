@@ -32,9 +32,19 @@ export default {
   },
 
   methods:{
+    checkKeyDownAlphaNumeric(event) {
+        if (!/[a-zA-Z0-9\s]/.test(event.key)) {
+            this.ignoredValue = event.key ? event.key : "";
+            event.preventDefault();
+        }
+    },
+
     async deleteOtherUser(){
         let res = await fetch('/api/admin/delete?username=' + this.username, {
         method: 'DELETE',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
       })
       if(res.status == 200){
           this.message = await res.text();
@@ -43,6 +53,9 @@ export default {
           if(sessionStorage.getItem("access_token")){
               let res = await fetch('/api/admin/delete?username=' + this.username, {
                     method: 'DELETE',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
                 })
                 if(res.status == 200){
                     this.message = await res.text();
@@ -59,6 +72,9 @@ export default {
     async blockUser(){
         let res = await fetch('/api/admin/block?username=' + this.username, {
         method: 'PUT',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
         })
       if(res.status == 200){
           this.message = await res.text();
@@ -67,6 +83,9 @@ export default {
           if(sessionStorage.getItem("access_token")){
               let res = await fetch('/api/admin/block?username=' + this.username, {
                     method: 'PUT',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
                 })
                 if(res.status == 200){
                     this.message = await res.text();
@@ -82,6 +101,9 @@ export default {
     async unBlockUser(){
         let res = await fetch('/api/admin/unBlock?username=' + this.username, {
         method: 'PUT',
+        headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
         })
       if(res.status == 200){
           this.message = await res.text();
@@ -90,6 +112,9 @@ export default {
           if(sessionStorage.getItem("access_token")){
               let res = await fetch('/api/admin/unBlock?username=' + this.username, {
                     method: 'PUT',
+                    headers: {
+                    "Authorization": "Bearer " + sessionStorage.getItem("access_token")
+            }
                 })
                 if(res.status == 200){
                     this.message = await res.text();

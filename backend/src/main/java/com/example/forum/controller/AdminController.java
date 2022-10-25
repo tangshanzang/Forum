@@ -1,22 +1,38 @@
 package com.example.forum.controller;
 
+import com.example.forum.service.AdminServices.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin")
-@CrossOrigin(origins = "http://localhost:8080")
+@RequestMapping("/api/admin")
+@CrossOrigin
 public class AdminController {
 
+    private final AdminService adminService;
+
     // users
-    public ResponseEntity<?> blockUser;
-    public ResponseEntity<?> unblockUser;
-    public ResponseEntity<?> restoreUser;
-    public ResponseEntity<?> adminDeleteUser;
+    @PutMapping("/block")
+    public ResponseEntity<?> blockUser(@RequestParam String username){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.blockUser(auth.getName(), username));
+    }
+
+    @PutMapping("/unBlock")
+    public ResponseEntity<?> unblockUser(@RequestParam String username){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.unBlockUser(auth.getName(), username));
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> adminDeleteUser(@RequestParam String username){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok().body(adminService.deleteUser(auth.getName(), username));
+    }
 
     // group
     public ResponseEntity<?> blockGroup;

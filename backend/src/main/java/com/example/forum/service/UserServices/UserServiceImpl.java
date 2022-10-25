@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public String deleteUser(String username) {
         AppUser user = userRepo.findByUsername(username);
-        user.setUsername("[Deleted]");
+        user.setUsername("[Deleted User]");
         user.setStatus("deleted");
         return "true";
     }

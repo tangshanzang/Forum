@@ -75,6 +75,11 @@ export default {
                     var user = await res.json();
                     this.name = user.name;
                     this.loggedIn = true;
+                    if(user.role == "ROLE_ADMIN"){
+                        this.isAdmin = true;
+                    }else{
+                        this.isAdmin = false;
+                    }
                     }
                 else{
                     this.getAccessTokenWithRefresh();
